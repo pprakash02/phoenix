@@ -3,9 +3,11 @@ from agent_framework import Agent
 from agent_framework.openai import OpenAIChatClient
 from dotenv import load_dotenv
 
+# Import the new analyst tools
+from tools.analyst_tools import search_logs, extract_numbers, count_occurrences
+
 load_dotenv()
 
-# Using the same GitHub Models endpoint
 chat_client = OpenAIChatClient(
     base_url=os.environ.get("GITHUB_ENDPOINT"),
     api_key=os.environ.get("GITHUB_TOKEN"),
@@ -36,11 +38,17 @@ Output your analysis in structured sections:
 
 Do not hallucinate functionality that is not supported by the logs.
 Only reason based on the observed runtime evidence.
+
+You have access to tools that help you examine logs:
+- search_logs: find lines matching a regex pattern.
+- extract_numbers: pull out all numeric values.
+- count_occurrences: count how many times a substring appears.
+Use them to extract precise information from the logs.
 """
 
-# Instantiate the analyst agent
 analyst_agent = Agent(
     name=ANALYST_NAME,
     instructions=ANALYST_INSTRUCTIONS,
+    tools=[search_logs, extract_numbers, count_occurrences],  # Tools added here
     client=chat_client
 )
