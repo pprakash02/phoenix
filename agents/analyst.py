@@ -1,14 +1,13 @@
 import os
-
-from agent_framework import Agent
-from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
+
 from agents.client import client
+from agent_framework import Agent
 
 from tools.analyst_tools import (
     parse_runtime_logs,
-    summarize_execution_results,
-    detect_function
+    detect_function,
+    summarize_execution_results
 )
 
 from schemas.test_spec import AnalystOutput
@@ -16,26 +15,32 @@ from schemas.test_spec import AnalystOutput
 load_dotenv()
 
 
-# chat_client = AzureOpenAIChatClient(
-#     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
-#     api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
-#     deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
-#     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
-# )
-
 ANALYST_INSTRUCTIONS = """
-You are the Analyst agent for Phoenix.
+You are the Analyst agent in the Phoenix autonomous code modernization system.
 
-You will receive raw runtime logs from the Observer.
+You receive RAW runtime logs produced by the Observer agent.
 
-Your job is to convert them into a structured JSON specification.
+Your task is to convert those logs into a structured behavioral specification
+that describes how the legacy function behaves.
 
-IMPORTANT:
-1. FIRST call the tool `parse_runtime_logs`.
-2. THEN call `detect_function`.
-3. THEN call `summarize_execution_results`.
+You MUST follow this exact pipeline:
 
-Finally produce a JSON specification containing:
+STEP 1
+Call the tool `parse_runtime_logs` with the raw runtime output.
+
+STEP 2
+Call `detect_function` to determine which function is being analyzed.
+
+STEP 3
+Call `summarize_execution_results` to classify the runtime results into:
+- successful mappings
+- crashes
+- edge cases
+
+STEP 4
+Return the final structured JSON specification.
+
+The JSON MUST contain the following fields:
 
 {
   "function_name": "...",
@@ -44,11 +49,15 @@ Finally produce a JSON specification containing:
   "edge_cases": [...]
 }
 
-Return ONLY valid JSON.
+Rules:
+- Always use the provided tools.
+- Do NOT invent outputs.
+- The final response MUST be valid JSON.
+- Do NOT include explanations.
 """
 
 
-analyst_agent = client.as_agent(
+analyst_agent: Agent = client.as_agent(
     name="Analyst",
     instructions=ANALYST_INSTRUCTIONS,
     tools=[
@@ -56,5 +65,6 @@ analyst_agent = client.as_agent(
         detect_function,
         summarize_execution_results,
     ],
-    # output_schema=AnalystOutput
+    output_schema=AnalystOutput,
+    temperature=0
 )

@@ -2,90 +2,69 @@ import json
 from typing import Annotated, List, Dict, Any
 from pydantic import Field
 from agent_framework import tool
+import re
 
-@tool(approval_mode="never_require")
+
+@tool
 def parse_runtime_logs(
-    raw_output: Annotated[str, Field(description="Raw terminal output containing JSON runtime logs from the Observer.")]
+    raw_output: str = Field(description="Raw observer output containing JSON logs")
 ) -> List[Dict[str, Any]]:
     """
-    Extract JSON objects from terminal output safely.
-    Assumes logs may contain text mixed with JSON lines.
+    Extract JSON runtime logs embedded in observer output.
     """
 
-    parsed_entries: List[Dict[str, Any]] = []
+    # find JSON array in the text
+    match = re.search(r"\[\s*{.*}\s*\]", raw_output, re.DOTALL)
 
-    for line in raw_output.splitlines():
+    if not match:
+        return []
 
-        line = line.strip()
+    json_block = match.group(0)
 
-        if not line.startswith("{"):
-            continue
+    try:
+        logs = json.loads(json_block)
+        return logs
+    except Exception:
+        return []
 
-        try:
-            obj = json.loads(line)
-
-            if "function" in obj:
-                parsed_entries.append(obj)
-
-        except json.JSONDecodeError:
-            continue
-
-    return parsed_entries
-
-@tool(approval_mode="never_require")
-def detect_function(
-        parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed runtime log dictionaries.")]
-) -> str:
+@tool
+def detect_function(logs: List[Dict[str, Any]]) -> str:
     """
-    Detect the primary function under test from logs.
-    Returns the most common function name.
+    Detect the function name from runtime logs.
     """
 
-    functions = [
-        entry.get("function")
-        for entry in parsed_logs
-        if entry.get("function") is not None
-    ]
-
-    if not functions:
+    if not logs:
         return "unknown"
 
-    return max(set(functions), key=functions.count)
+    return logs[0].get("function", "unknown")
 
 
-@tool(approval_mode="never_require")
-def summarize_execution_results(
-    parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed execution dictionaries.")]
-) -> Dict[str, Any]:
+@tool
+def summarize_execution_results(logs: List[Dict[str, Any]]) -> Dict:
     """
-    Aggregate results into successful mappings and crash reports.
+    Convert runtime logs into behavioral specification.
     """
 
-    summary = {
-        "successful_mappings": [],
-        "crashes": []
-    }
+    successes = []
+    crashes = []
+    edges = []
 
-    for entry in parsed_logs:
+    for log in logs:
+        inp = log["inputs"]["args"][0]
 
-        inputs = entry.get("inputs", {})
-        args = inputs.get("args", [])
-
-        input_val = args[0] if args else None
-
-        if entry.get("status") == "success":
-
-            summary["successful_mappings"].append({
-                "input": input_val,
-                "output": entry.get("output")
+        if log["status"] == "success":
+            successes.append({
+                "input": inp,
+                "output": log["output"]
             })
-
         else:
-
-            summary["crashes"].append({
-                "input": input_val,
-                "error": entry.get("error"),
-                "traceback": entry.get("traceback")
+            crashes.append({
+                "input": inp,
+                "error": log["error"]
             })
 
-    return summary
+    return {
+        "successful_mappings": successes,
+        "crashes": crashes,
+        "edge_cases": edges
+    }

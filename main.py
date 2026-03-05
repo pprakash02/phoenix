@@ -113,7 +113,7 @@ async def run_phoenix() -> None:
             critic_agent,
         ],
         selection_func=round_robin_router,
-        max_rounds=4,  # critical fix to stop workflow
+        max_rounds=10,  # critical fix to stop workflow
     ).build()
 
     mission_briefing = """
