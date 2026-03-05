@@ -8,7 +8,7 @@ from agent_framework import tool
 from tools.docker_sandbox import run_legacy_code_in_sandbox
 
 
-@tool
+@tool(approval_mode="never_require")
 def capture_function_runtime(
         file_path: str = Field(description="The absolute or relative path to the legacy Python file."),
         function_name: str = Field(description="The specific function to instrument (e.g., process_transaction)."),

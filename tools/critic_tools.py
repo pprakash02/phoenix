@@ -4,7 +4,7 @@ from pydantic import Field
 from agent_framework import tool
 from tools.docker_sandbox import run_legacy_code_in_sandbox
 
-@tool
+@tool(approval_mode="never_require")
 def verify_test_results(
     test_file_name: str = Field(description="The name of the test file saved in 'generated_tests'."),
     legacy_file_path: str = Field(description="Path to the original legacy code.")
@@ -31,7 +31,7 @@ def verify_test_results(
     )
 
 
-@tool
+@tool(approval_mode="never_require")
 def read_test_file(
     test_file_name: str = Field(description="The name of the test file in 'generated_tests'.")
 ) -> str:

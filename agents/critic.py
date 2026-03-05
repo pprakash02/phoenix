@@ -1,11 +1,8 @@
-# agents/critic.py
 import os
-from agent_framework import Agent
 from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
 
 from tools.critic_tools import verify_test_results, read_test_file
-from schemas.validation_report import CriticReport
 
 load_dotenv()
 
@@ -15,7 +12,6 @@ chat_client = AzureOpenAIChatClient(
     deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
 )
-
 
 CRITIC_INSTRUCTIONS = """
 You are the Critic (Validation Agent) for Phoenix. 
@@ -33,10 +29,9 @@ You must return your findings in the structured CriticReport format.
 Only set 'is_approved' to True if all tests pass in the sandbox and coverage is 100%.
 """
 
-critic_agent = Agent(
+
+critic_agent = chat_client.as_agent(
     name="Critic",
     instructions=CRITIC_INSTRUCTIONS,
-    tools=[verify_test_results, read_test_file],
-    client=chat_client,
-    output_schema=CriticReport
+    tools=[verify_test_results, read_test_file]
 )

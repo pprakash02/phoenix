@@ -1,6 +1,4 @@
-# agents/observer.py
 import os
-from agent_framework import Agent
 from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
 
@@ -16,7 +14,6 @@ chat_client = AzureOpenAIChatClient(
     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
 )
 
-
 OBSERVER_NAME = "Observer"
 OBSERVER_INSTRUCTIONS = """
 You are the Observer agent for the Phoenix modernization system. 
@@ -28,10 +25,8 @@ You have two tools:
 
 Pass diverse `test_inputs` (like positive numbers, negative numbers, strings, and zero) to uncover hidden bugs. Report the raw JSON execution data back to the Analyst.
 """
-
-observer_agent = Agent(
+observer_agent = chat_client.as_agent(
     name=OBSERVER_NAME,
     instructions=OBSERVER_INSTRUCTIONS,
-    tools=[run_legacy_code_in_sandbox, capture_function_runtime],
-    client=chat_client
+    tools=[run_legacy_code_in_sandbox, capture_function_runtime]
 )

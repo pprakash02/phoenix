@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict, Optional
 from pydantic import Field
 from agent_framework import tool
 
-@tool
+@tool(approval_mode="never_require")
 def run_legacy_code_in_sandbox(
     file_path: str = Field(description="The absolute or relative path to the legacy Python file."),
     input_args: str = Field(default="", description="Command line arguments to pass to the script."),

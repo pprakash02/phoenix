@@ -3,7 +3,7 @@ import os
 from pydantic import Field
 from agent_framework import tool
 
-@tool
+@tool(approval_mode="never_require")
 def save_test_suite(
     code: str = Field(description="The complete, raw Python pytest code to save."),
     file_name: str = Field(default="test_legacy_billing.py", description="The name of the test file.")

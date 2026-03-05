@@ -4,7 +4,7 @@ from pydantic import Field
 from agent_framework import tool
 
 
-@tool
+@tool(approval_mode="never_require")
 def parse_runtime_logs(
     raw_output: str = Field(
         description="Raw terminal output containing JSON runtime logs from the Observer."
@@ -36,7 +36,7 @@ def parse_runtime_logs(
     return parsed_entries
 
 
-@tool
+@tool(approval_mode="never_require")
 def detect_function(
     parsed_logs: List[Dict[str, Any]] = Field(
         description="Parsed runtime log dictionaries."
@@ -59,7 +59,7 @@ def detect_function(
     return max(set(functions), key=functions.count)
 
 
-@tool
+@tool(approval_mode="never_require")
 def summarize_execution_results(
     parsed_logs: List[Dict[str, Any]] = Field(
         description="Parsed execution dictionaries."

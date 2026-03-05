@@ -1,19 +1,11 @@
 import os
-
-from agent_framework import Agent
 from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
 
-from tools.analyst_tools import (
-    parse_runtime_logs,
-    summarize_execution_results,
-    detect_function
-)
-
-from schemas.test_spec import AnalystOutput
+from tools.analyst_tools import parse_runtime_logs, summarize_execution_results, detect_function
+# from schemas.test_spec import AnalystOutput # Used during run or via system prompt
 
 load_dotenv()
-
 
 chat_client = AzureOpenAIChatClient(
     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
@@ -22,7 +14,7 @@ chat_client = AzureOpenAIChatClient(
     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
 )
 
-ANALYST_INSTRUCTIONS = """
+ANALYST_INSTRUCTIONS ="""
 You are the Analyst agent for Phoenix.
 
 Your job is to convert raw runtime logs from the Observer into a
@@ -45,15 +37,8 @@ Rules:
 Return ONLY the structured JSON output matching the provided schema.
 """
 
-
-analyst_agent = Agent(
+analyst_agent = chat_client.as_agent(
     name="Analyst",
     instructions=ANALYST_INSTRUCTIONS,
-    tools=[
-        parse_runtime_logs,
-        detect_function,
-        summarize_execution_results
-    ],
-    client=chat_client,
-    output_schema=AnalystOutput
+    tools=[parse_runtime_logs, detect_function, summarize_execution_results]
 )

@@ -1,6 +1,4 @@
-# agents/qa_engineer.py
 import os
-from agent_framework import Agent
 from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
 
@@ -34,9 +32,8 @@ Rules:
 • After you receive the SUCCESS message from the `save_test_suite` tool, report back to the team that the file is ready.
 """
 
-qa_engineer_agent = Agent(
+qa_engineer_agent = chat_client.as_agent(
     name="QA_Engineer",
     instructions=QA_INSTRUCTIONS,
-    tools=[save_test_suite],
-    client=chat_client
+    tools=[save_test_suite]
 )
