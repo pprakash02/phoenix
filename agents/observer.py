@@ -1,7 +1,7 @@
 # agents/observer.py
 import os
 from agent_framework import Agent
-from agent_framework.openai import OpenAIChatClient
+from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
 
 from tools.docker_sandbox import run_legacy_code_in_sandbox
@@ -9,11 +9,13 @@ from tools.runtime_capture import capture_function_runtime
 
 load_dotenv()
 
-chat_client = OpenAIChatClient(
-    base_url=os.environ.get("GITHUB_ENDPOINT"),
-    api_key=os.environ.get("GITHUB_TOKEN"),
-    model=os.environ.get("GITHUB_MODEL_ID")
+chat_client = AzureOpenAIChatClient(
+    azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+    api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+    azure_deployment=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
+    api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
 )
+
 
 OBSERVER_NAME = "Observer"
 OBSERVER_INSTRUCTIONS = """
