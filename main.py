@@ -46,15 +46,20 @@ async def run_phoenix():
     4. Critic: Review the saved PyTest code. Approve it if the coverage is complete, or reject it with feedback.
     """
 
-    print("[SYSTEM] Task dispatched to the team. Stand by for agent collaboration...\n")
 
-    # Stream the live conversation to the terminal
-    # Stream the live conversation to the terminal
-    async for message in workflow.run_stream(task=mission_briefing):
-        if message.text:
-            # Depending on the specific AF release, 'speaker' or 'name' tracks the author
-            author = getattr(message, "speaker", getattr(message, "name", "Agent"))
-            print(f"[{author}]:\n{message.text}\n")
+    print("[SYSTEM] Task dispatched to the team. Stand by for agent collaboration (this may take a minute)...\n")
+
+    # Await the workflow to finish and capture the entire conversation history
+    final_conversation = await workflow.run(mission_briefing)
+
+    # Iterate through the returned list of messages and print them
+    for message in final_conversation:
+        # Check if the message has text content
+        text_content = getattr(message, "text", getattr(message, "content", None))
+
+        if text_content:
+            author = getattr(message, "speaker", getattr(message, "name", getattr(message, "author_name", "Agent")))
+            print(f"[{author}]:\n{text_content}\n")
             print("-" * 50)
 
 if __name__ == "__main__":
