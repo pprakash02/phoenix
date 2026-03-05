@@ -35,6 +35,18 @@ Rules:
 • Every test_spec must correspond to an observed runtime case.
 
 Return ONLY the structured JSON output matching the provided schema.
+Format your output EXACTLY as this JSON object:
+{
+  "function_under_test": "string",
+  "business_logic_summary": "string",
+  "test_specs": [
+    {
+      "input": "Any",
+      "expected_behavior": "string",
+      "expected_result": "Any"
+    }
+  ]
+}
 """
 
 analyst_agent = chat_client.as_agent(

@@ -1,18 +1,15 @@
 # tools/runtime_capture.py
 import os
-import json
+from typing import Annotated
 from pydantic import Field
 from agent_framework import tool
-
-# Import the existing sandbox tool to run our instrumented code securely
 from tools.docker_sandbox import run_legacy_code_in_sandbox
-
 
 @tool(approval_mode="never_require")
 def capture_function_runtime(
-        file_path: str = Field(description="The absolute or relative path to the legacy Python file."),
-        function_name: str = Field(description="The specific function to instrument (e.g., process_transaction)."),
-        test_inputs: list[str] = Field(description="A list of string inputs to pass to the function.")
+    file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
+    function_name: Annotated[str, Field(description="The specific function to instrument (e.g., process_transaction).")],
+    test_inputs: Annotated[list[str], Field(description="A list of string inputs to pass to the function.")]
 ) -> str:
     """
     Dynamically attaches a decorator to a legacy function to capture its exact inputs,

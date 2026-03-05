@@ -1,14 +1,11 @@
 import json
-from typing import List, Dict, Any
+from typing import Annotated, List, Dict, Any
 from pydantic import Field
 from agent_framework import tool
 
-
 @tool(approval_mode="never_require")
 def parse_runtime_logs(
-    raw_output: str = Field(
-        description="Raw terminal output containing JSON runtime logs from the Observer."
-    )
+    raw_output: Annotated[str, Field(description="Raw terminal output containing JSON runtime logs from the Observer.")]
 ) -> List[Dict[str, Any]]:
     """
     Extract JSON objects from terminal output safely.
@@ -35,12 +32,9 @@ def parse_runtime_logs(
 
     return parsed_entries
 
-
 @tool(approval_mode="never_require")
 def detect_function(
-    parsed_logs: List[Dict[str, Any]] = Field(
-        description="Parsed runtime log dictionaries."
-    )
+        parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed runtime log dictionaries.")]
 ) -> str:
     """
     Detect the primary function under test from logs.
@@ -61,9 +55,7 @@ def detect_function(
 
 @tool(approval_mode="never_require")
 def summarize_execution_results(
-    parsed_logs: List[Dict[str, Any]] = Field(
-        description="Parsed execution dictionaries."
-    )
+    parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed execution dictionaries.")]
 ) -> Dict[str, Any]:
     """
     Aggregate results into successful mappings and crash reports.

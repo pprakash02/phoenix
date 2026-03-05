@@ -1,17 +1,17 @@
 # tools/docker_sandbox.py
 import docker
 import os
-from typing import List, Tuple, Dict, Optional
+from typing import Annotated, List, Tuple, Dict, Optional
 from pydantic import Field
 from agent_framework import tool
 
 @tool(approval_mode="never_require")
 def run_legacy_code_in_sandbox(
-    file_path: str = Field(description="The absolute or relative path to the legacy Python file."),
-    input_args: str = Field(default="", description="Command line arguments to pass to the script."),
-    extra_volumes: List[Tuple[str, str]] = Field(default=[], description="Additional (host_path, container_path) mounts."),
-    env: Dict[str, str] = Field(default={}, description="Environment variables for the container."),
-    command: Optional[str] = Field(default=None, description="Override the default command (e.g., 'pytest /workspace/test.py').")
+    file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
+    input_args: Annotated[str, Field(description="Command line arguments to pass to the script.")] = "",
+    extra_volumes: Annotated[List[Tuple[str, str]], Field(description="Additional (host_path, container_path) mounts.")] = [],
+    env: Annotated[Dict[str, str], Field(description="Environment variables for the container.")] = {},
+    command: Annotated[Optional[str], Field(description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None
 ) -> str:
     """
     Executes a legacy Python script securely inside an isolated, air-gapped Docker container.
