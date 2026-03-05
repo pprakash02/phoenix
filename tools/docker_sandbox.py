@@ -1,91 +1,63 @@
-import json
-from typing import Annotated, List, Dict, Any
+# tools/docker_sandbox.py
+import docker
+import os
+from typing import Annotated, List, Tuple, Dict, Optional
 from pydantic import Field
 from agent_framework import tool
 
 @tool(approval_mode="never_require")
-def parse_runtime_logs(
-    raw_output: Annotated[str, Field(description="Raw terminal output containing JSON runtime logs from the Observer.")]
-) -> List[Dict[str, Any]]:
-    """
-    Extract JSON objects from terminal output safely.
-    Assumes logs may contain text mixed with JSON lines.
-    """
-
-    parsed_entries: List[Dict[str, Any]] = []
-
-    for line in raw_output.splitlines():
-
-        line = line.strip()
-
-        if not line.startswith("{"):
-            continue
-
-        try:
-            obj = json.loads(line)
-
-            if "function" in obj:
-                parsed_entries.append(obj)
-
-        except json.JSONDecodeError:
-            continue
-
-    return parsed_entries
-
-@tool(approval_mode="never_require")
-def detect_function(
-        parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed runtime log dictionaries.")]
+def run_legacy_code_in_sandbox(
+    file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
+    input_args: Annotated[str, Field(description="Command line arguments to pass to the script.")] = "",
+    extra_volumes: Annotated[List[Tuple[str, str]], Field(description="Additional (host_path, container_path) mounts.")] = [],
+    env: Annotated[Dict[str, str], Field(description="Environment variables for the container.")] = {},
+    command: Annotated[Optional[str], Field(description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None
 ) -> str:
     """
-    Detect the primary function under test from logs.
-    Returns the most common function name.
+    Executes a legacy Python script securely inside an isolated, air-gapped Docker container.
+    Returns the raw terminal output (stdout/stderr) for the Analyst to review.
     """
+    try:
+        client = docker.from_env()
+    except docker.errors.DockerException:
+        return "System Error: Docker daemon is not running on the host. Please start Docker."
 
-    functions = [
-        entry.get("function")
-        for entry in parsed_logs
-        if entry.get("function") is not None
-    ]
+    abs_path = os.path.abspath(file_path)
+    dir_name = os.path.dirname(abs_path)
+    file_name = os.path.basename(abs_path)
 
-    if not functions:
-        return "unknown"
+    print(f"\n[SYSTEM] Spinning up secure Phoenix sandbox for {file_name}...")
 
-    return max(set(functions), key=functions.count)
-
-
-@tool(approval_mode="never_require")
-def summarize_execution_results(
-    parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed execution dictionaries.")]
-) -> Dict[str, Any]:
-    """
-    Aggregate results into successful mappings and crash reports.
-    """
-
-    summary = {
-        "successful_mappings": [],
-        "crashes": []
+    # Build volumes: primary mount + extra volumes
+    volumes = {
+        dir_name: {'bind': '/workspace', 'mode': 'ro'}
     }
+    for host_path, container_path in extra_volumes:
+        volumes[host_path] = {'bind': container_path, 'mode': 'ro'}
 
-    for entry in parsed_logs:
+    # Determine the command to run
+    if command is None:
+        # default: run the file with python
+        cmd = f"python /workspace/{file_name} {input_args}"
+    else:
+        cmd = command
 
-        inputs = entry.get("inputs", {})
-        args = inputs.get("args", [])
-
-        input_val = args[0] if args else None
-
-        if entry.get("status") == "success":
-
-            summary["successful_mappings"].append({
-                "input": input_val,
-                "output": entry.get("output")
-            })
-
-        else:
-
-            summary["crashes"].append({
-                "input": input_val,
-                "error": entry.get("error"),
-                "traceback": entry.get("traceback")
-            })
-
-    return summary
+    try:
+        raw_logs = client.containers.run(
+            image="python:3.10-slim",
+            command=cmd,
+            volumes=volumes,
+            environment=env,
+            remove=True,
+            network_disabled=True,
+            mem_limit="256m",
+            cpu_period=100000,
+            cpu_quota=50000
+        )
+        logs_str = raw_logs.decode('utf-8') if isinstance(raw_logs, bytes) else str(raw_logs)
+        return f"Execution Successful. Output Logs:\n{logs_str}"
+    except docker.errors.ContainerError as e:
+        error_msg = e.stderr.decode('utf-8') if isinstance(e.stderr, bytes) else str(e.stderr)
+        return f"Execution Failed with Exit Code {e.exit_status}.\nError Logs:\n{error_msg}"
+    except Exception as e:
+        return f"Sandbox Fault: Could not execute environment. {str(e)}"
