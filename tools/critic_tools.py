@@ -1,91 +1,50 @@
-import json
-from typing import Annotated, List, Dict, Any
+# tools/critic_tools.py
+import os
+from typing import Annotated
 from pydantic import Field
 from agent_framework import tool
+from tools.docker_sandbox import run_legacy_code_in_sandbox
 
 @tool(approval_mode="never_require")
-def parse_runtime_logs(
-    raw_output: Annotated[str, Field(description="Raw terminal output containing JSON runtime logs from the Observer.")]
-) -> List[Dict[str, Any]]:
-    """
-    Extract JSON objects from terminal output safely.
-    Assumes logs may contain text mixed with JSON lines.
-    """
-
-    parsed_entries: List[Dict[str, Any]] = []
-
-    for line in raw_output.splitlines():
-
-        line = line.strip()
-
-        if not line.startswith("{"):
-            continue
-
-        try:
-            obj = json.loads(line)
-
-            if "function" in obj:
-                parsed_entries.append(obj)
-
-        except json.JSONDecodeError:
-            continue
-
-    return parsed_entries
-
-@tool(approval_mode="never_require")
-def detect_function(
-        parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed runtime log dictionaries.")]
+def verify_test_results(
+    test_file_name: Annotated[str, Field(description="The name of the test file saved in 'generated_tests'.")],
+    legacy_file_path: Annotated[str, Field(description="Path to the original legacy code.")]
 ) -> str:
     """
-    Detect the primary function under test from logs.
-    Returns the most common function name.
+    Runs the generated test suite in the Docker sandbox to confirm it passes.
     """
+    test_path = os.path.abspath(os.path.join("generated_tests", test_file_name))
+    legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
 
-    functions = [
-        entry.get("function")
-        for entry in parsed_logs
-        if entry.get("function") is not None
-    ]
+    # Command to install pytest and run the test file
+    cmd = f"sh -c 'pip install --quiet pytest && pytest /workspace/{test_file_name} -v'"
 
-    if not functions:
-        return "unknown"
+    # Mount legacy directory as /legacy and set PYTHONPATH so imports work
+    extra_volumes = [(legacy_dir, '/legacy')]
+    env = {'PYTHONPATH': '/legacy'}
 
-    return max(set(functions), key=functions.count)
+    return run_legacy_code_in_sandbox(
+        file_path=test_path,
+        input_args="",          # not used because we override command
+        extra_volumes=extra_volumes,
+        env=env,
+        command=cmd
+    )
 
 
 @tool(approval_mode="never_require")
-def summarize_execution_results(
-    parsed_logs: Annotated[List[Dict[str, Any]], Field(description="Parsed execution dictionaries.")]
-) -> Dict[str, Any]:
+def read_test_file(
+    test_file_name: Annotated[str, Field(description="The name of the test file in 'generated_tests'.")]
+) -> str:
     """
-    Aggregate results into successful mappings and crash reports.
+    Reads the content of a generated test file.
     """
-
-    summary = {
-        "successful_mappings": [],
-        "crashes": []
-    }
-
-    for entry in parsed_logs:
-
-        inputs = entry.get("inputs", {})
-        args = inputs.get("args", [])
-
-        input_val = args[0] if args else None
-
-        if entry.get("status") == "success":
-
-            summary["successful_mappings"].append({
-                "input": input_val,
-                "output": entry.get("output")
-            })
-
-        else:
-
-            summary["crashes"].append({
-                "input": input_val,
-                "error": entry.get("error"),
-                "traceback": entry.get("traceback")
-            })
-
-    return summary
+    test_path = os.path.abspath(os.path.join("generated_tests", test_file_name))
+    try:
+        with open(test_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return content
+    except FileNotFoundError:
+        return f"ERROR: Test file {test_file_name} not found in generated_tests directory."
+    except Exception as e:
+        return f"ERROR: Failed to read test file: {str(e)}"
