@@ -117,17 +117,21 @@ async def run_phoenix() -> None:
     ).build()
 
     mission_briefing = """
-Team Phoenix,
+    Team Phoenix,
 
-We need to modernize the undocumented legacy script:
-legacy_workspace/legacy_billing.py
+    We need to modernize the undocumented legacy script: 
+    legacy_workspace/legacy_billing.py
 
-Workflow:
-1. Observer: Capture runtime behavior of `process_transaction` with inputs ['100', '-50', '0', '500'].
-2. Analyst: Parse runtime logs and generate structured JSON specification.
-3. QA Engineer: Convert JSON specification into a PyTest suite and save it.
-4. Critic: Validate coverage, run the tests, and approve or reject the generated suite.
-"""
+    Workflow:
+    1. Observer: 
+       - First, run `run_legacy_code_in_sandbox` with the command `cat /workspace/legacy_billing.py` to read the entire source code.
+       - Identify all primary functions (like `process_transaction`).
+       - For each function, generate 5-10 diverse test inputs including edge cases (negatives, zero, empty strings, large numbers) based on your analysis of the logic.
+       - Execute `capture_function_runtime` for each function using your self-generated inputs.
+    2. Analyst: Parse all runtime logs to create a full behavioral specification of the program.
+    3. QA Engineer: Convert the entire specification into a production-ready PyTest suite covering all identified functions and save it.
+    4. Critic: Verify the suite in the sandbox, ensure 100% coverage of the logic you observed, and approve.
+    """
 
     print("[SYSTEM] Dispatching mission to Phoenix agents...\n")
 
