@@ -9,7 +9,6 @@ from agents.critic import critic_agent
 # Agent Framework orchestration
 from agent_framework.orchestrations import GroupChatBuilder, GroupChatState
 
-
 def round_robin_router(state: GroupChatState) -> str | None:
     """
     Controls which agent speaks next.
@@ -20,91 +19,65 @@ def round_robin_router(state: GroupChatState) -> str | None:
     2 → QA Engineer
     3 → Critic
     """
-
     if state.current_round == 0:
         return "Observer"
-
     if state.current_round == 1:
         return "Analyst"
-
     if state.current_round == 2:
         return "QA_Engineer"
-
     if state.current_round == 3:
         return "Critic"
 
     # Stop workflow
     return None
 
-
 async def run_phoenix() -> None:
-
     print("\n--- PHOENIX MULTI-AGENT SYSTEM INITIALIZED ---\n")
 
-    # Build the group-chat workflow
-    workflow = (
-        GroupChatBuilder()
-        .participants(
-            [
-                observer_agent,
-                analyst_agent,
-                qa_engineer_agent,
-                critic_agent,
-            ]
-        )
-        .selection_func(round_robin_router)
-        .build()
-    )
+    # Use the GroupChatBuilder class to create a workflow.
+    # Pass participants directly into the constructor to satisfy validation.
+    workflow = GroupChatBuilder(
+        participants=[
+            observer_agent,
+            analyst_agent,
+            qa_engineer_agent,
+            critic_agent,
+        ],
+        selection_func=round_robin_router
+    ).build()
 
     mission_briefing = """
 Team Phoenix,
 
 We need to modernize the undocumented legacy script:
-
 legacy_workspace/legacy_billing.py
 
 Workflow:
-
-1. Observer
-   • Capture runtime behavior of `process_transaction`
-   • Use test inputs: ['100', '-50', '0', '500']
-
-2. Analyst
-   • Parse runtime logs
-   • Generate structured JSON specification
-
-3. QA Engineer
-   • Convert JSON specification into a PyTest suite
-   • Save the test file using save_test_suite
-
-4. Critic
-   • Validate coverage
-   • Run the tests
-   • Approve or reject the generated suite
+1. Observer: Capture runtime behavior of `process_transaction` with inputs ['100', '-50', '0', '500'].
+2. Analyst: Parse runtime logs and generate structured JSON specification.
+3. QA Engineer: Convert JSON specification into a PyTest suite and save it.
+4. Critic: Validate coverage, run the tests, and approve or reject the generated suite.
 """
 
     print("[SYSTEM] Dispatching mission to Phoenix agents...\n")
 
-    # Run the workflow
+    # Call the workflow's run method with the task or input you want the agents to work on[cite: 3937].
     conversation = await workflow.run(mission_briefing)
 
     print("\n--- AGENT CONVERSATION ---\n")
 
     for message in conversation:
-
         author = getattr(
             message,
             "speaker",
             getattr(message, "name", getattr(message, "author_name", "Agent")),
         )
-
         text = getattr(message, "text", getattr(message, "content", ""))
 
         if text:
             print(f"[{author}]")
             print(text)
             print("\n" + "-" * 60 + "\n")
-
 
 if __name__ == "__main__":
     asyncio.run(run_phoenix())
