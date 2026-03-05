@@ -55,5 +55,5 @@ analyst_agent = client.as_agent(
         detect_function,
         summarize_execution_results,
     ],
-    output_schema=AnalystOutput
+    # output_schema=AnalystOutput
 )
