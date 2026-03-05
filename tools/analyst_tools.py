@@ -1,31 +1,99 @@
-import re
-from typing import List
+import json
+from typing import List, Dict, Any
 from pydantic import Field
 from agent_framework import tool
 
-@tool
-def search_logs(
-    log_text: str = Field(description="The log text to search within."),
-    pattern: str = Field(description="The regex pattern to search for.")
-) -> List[str]:
-    """Search the log text for lines that match a given regex pattern."""
-    lines = log_text.splitlines()
-    matches = [line for line in lines if re.search(pattern, line)]
-    return matches
 
 @tool
-def extract_numbers(
-    log_text: str = Field(description="The log text to extract numbers from.")
-) -> List[float]:
-    """Extract all floating-point numbers from the log text."""
-    # Find all numbers (including decimals, optional sign)
-    numbers = re.findall(r"-?\d+\.?\d*", log_text)
-    return [float(num) for num in numbers]
+def parse_runtime_logs(
+    raw_output: str = Field(
+        description="Raw terminal output containing JSON runtime logs from the Observer."
+    )
+) -> List[Dict[str, Any]]:
+    """
+    Extract JSON objects from terminal output safely.
+    Assumes logs may contain text mixed with JSON lines.
+    """
+
+    parsed_entries: List[Dict[str, Any]] = []
+
+    for line in raw_output.splitlines():
+
+        line = line.strip()
+
+        if not line.startswith("{"):
+            continue
+
+        try:
+            obj = json.loads(line)
+
+            if "function" in obj:
+                parsed_entries.append(obj)
+
+        except json.JSONDecodeError:
+            continue
+
+    return parsed_entries
+
 
 @tool
-def count_occurrences(
-    log_text: str = Field(description="The log text."),
-    substring: str = Field(description="The substring to count.")
-) -> int:
-    """Count the number of occurrences of a substring in the log text."""
-    return log_text.count(substring)
+def detect_function(
+    parsed_logs: List[Dict[str, Any]] = Field(
+        description="Parsed runtime log dictionaries."
+    )
+) -> str:
+    """
+    Detect the primary function under test from logs.
+    Returns the most common function name.
+    """
+
+    functions = [
+        entry.get("function")
+        for entry in parsed_logs
+        if entry.get("function") is not None
+    ]
+
+    if not functions:
+        return "unknown"
+
+    return max(set(functions), key=functions.count)
+
+
+@tool
+def summarize_execution_results(
+    parsed_logs: List[Dict[str, Any]] = Field(
+        description="Parsed execution dictionaries."
+    )
+) -> Dict[str, Any]:
+    """
+    Aggregate results into successful mappings and crash reports.
+    """
+
+    summary = {
+        "successful_mappings": [],
+        "crashes": []
+    }
+
+    for entry in parsed_logs:
+
+        inputs = entry.get("inputs", {})
+        args = inputs.get("args", [])
+
+        input_val = args[0] if args else None
+
+        if entry.get("status") == "success":
+
+            summary["successful_mappings"].append({
+                "input": input_val,
+                "output": entry.get("output")
+            })
+
+        else:
+
+            summary["crashes"].append({
+                "input": input_val,
+                "error": entry.get("error"),
+                "traceback": entry.get("traceback")
+            })
+
+    return summary

@@ -1,12 +1,17 @@
 import os
+
 from agent_framework import Agent
 from agent_framework.openai import OpenAIChatClient
 from dotenv import load_dotenv
 
-# Import the new analyst tools
-from tools.analyst_tools import search_logs, extract_numbers, count_occurrences
+from tools.analyst_tools import (
+    parse_runtime_logs,
+    summarize_execution_results,
+    detect_function
+)
 
 load_dotenv()
+
 
 chat_client = OpenAIChatClient(
     base_url=os.environ.get("GITHUB_ENDPOINT"),
@@ -14,41 +19,52 @@ chat_client = OpenAIChatClient(
     model=os.environ.get("GITHUB_MODEL_ID")
 )
 
-ANALYST_NAME = "Analyst"
 
 ANALYST_INSTRUCTIONS = """
-You are the Analyst agent in the Phoenix legacy modernization system.
+You are the Analyst agent for Phoenix.
 
-Your task is to analyze runtime execution logs produced by the Observer agent.
-The logs contain inputs, outputs, errors, and stack traces from executing legacy code.
+Your job is to transform raw runtime logs from the Observer into
+a structured test specification for the QA Engineer.
 
-Your responsibilities:
+Workflow:
 
-1. Identify patterns in the program's behavior.
-2. Infer the likely business logic of the system.
-3. Detect edge cases (invalid inputs, boundary conditions, error cases).
-4. Structure the findings clearly so that the QA Engineer agent can generate regression tests.
+1. Use `parse_runtime_logs` to extract JSON execution logs.
+2. Use `detect_function` to determine the function under test.
+3. Use `summarize_execution_results` to categorize successes and crashes.
+4. Infer the business logic from successful mappings.
+5. Identify hidden bugs from crash cases.
 
-Output your analysis in structured sections:
+Important rules:
 
-- Observed Behaviors
-- Inferred Business Logic
-- Edge Cases
-- Suggested Test Scenarios
+• Only reason using the provided logs.
+• Do NOT hallucinate missing behavior.
+• Every test spec must correspond to an observed runtime case.
 
-Do not hallucinate functionality that is not supported by the logs.
-Only reason based on the observed runtime evidence.
+Your final response MUST be valid JSON with this schema:
 
-You have access to tools that help you examine logs:
-- search_logs: find lines matching a regex pattern.
-- extract_numbers: pull out all numeric values.
-- count_occurrences: count how many times a substring appears.
-Use them to extract precise information from the logs.
+{
+  "function_under_test": "function_name",
+  "business_logic_summary": "description of observed behavior",
+  "test_specs": [
+    {
+      "input": value,
+      "expected_behavior": "success | exception",
+      "expected_result": value_or_error
+    }
+  ]
+}
+
+Return ONLY the JSON block.
 """
 
+
 analyst_agent = Agent(
-    name=ANALYST_NAME,
+    name="Analyst",
     instructions=ANALYST_INSTRUCTIONS,
-    tools=[search_logs, extract_numbers, count_occurrences],  # Tools added here
+    tools=[
+        parse_runtime_logs,
+        detect_function,
+        summarize_execution_results
+    ],
     client=chat_client
 )
