@@ -7,41 +7,33 @@ from agents.analyst import analyst_agent
 from agents.qa_engineer import qa_engineer_agent
 from agents.critic import critic_agent
 
-# Import the framework's actual orchestration builder and typing
+# Import the framework's updated orchestration builder and state typing
 from agent_framework.orchestrations import GroupChatBuilder, GroupChatState
-
 
 def round_robin_manager(state: GroupChatState) -> str | None:
     """
     A deterministic routing function that controls speaker selection.
-    Routes the conversation linearly and terminates after the Critic.
+    Uses the built-in current_round to route linearly and terminate.
     """
-    # Check the history to see who spoke last
-    last_speaker = state["history"][-1].speaker if state["history"] else None
-
-    if last_speaker is None:
-        return "Observer"  # 1. Start with the Observer
-    elif last_speaker == "Observer":
-        return "Analyst"  # 2. Hand off to the Analyst
-    elif last_speaker == "Analyst":
+    if state.current_round == 0:
+        return "Observer"     # 1. Start with the Observer
+    elif state.current_round == 1:
+        return "Analyst"      # 2. Hand off to the Analyst
+    elif state.current_round == 2:
         return "QA_Engineer"  # 3. Pass requirements to QA
-    elif last_speaker == "QA_Engineer":
-        return "Critic"  # 4. QA passes code to Critic
-    elif last_speaker == "Critic":
-        return None  # 5. Terminate the chat (Returning None stops the workflow)
-
-    return None
-
+    elif state.current_round == 3:
+        return "Critic"       # 4. QA passes code to Critic
+    else:
+        return None           # 5. Terminate the chat (Returning None stops the workflow)
 
 async def run_phoenix():
     print("--- PHOENIX MULTI-AGENT ORCHESTRATION INITIALIZED ---\n")
 
-    # Build the group chat workflow using the GroupChatBuilder
-    workflow = (
-        GroupChatBuilder(participants=[observer_agent, analyst_agent, qa_engineer_agent, critic_agent])
-        .set_select_speakers_func(round_robin_manager)
-        .build()
-    )
+    # Build the group chat workflow using the updated constructor parameters
+    workflow = GroupChatBuilder(
+        participants=[observer_agent, analyst_agent, qa_engineer_agent, critic_agent],
+        selection_func=round_robin_manager # Pass the function here directly
+    ).build()
 
     # Define the kickoff task for the team
     mission_briefing = """
@@ -57,13 +49,13 @@ async def run_phoenix():
     print("[SYSTEM] Task dispatched to the team. Stand by for agent collaboration...\n")
 
     # Stream the live conversation to the terminal
-    async for message in workflow.run(mission_briefing):
+    # Stream the live conversation to the terminal
+    async for message in workflow.run_stream(task=mission_briefing):
         if message.text:
             # Depending on the specific AF release, 'speaker' or 'name' tracks the author
             author = getattr(message, "speaker", getattr(message, "name", "Agent"))
             print(f"[{author}]:\n{message.text}\n")
             print("-" * 50)
-
 
 if __name__ == "__main__":
     asyncio.run(run_phoenix())
