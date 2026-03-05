@@ -1,14 +1,14 @@
+# agents/observer.py
 import os
 from agent_framework import Agent
 from agent_framework.openai import OpenAIChatClient
 from dotenv import load_dotenv
 
-# Import the custom Docker sandbox tool we built
 from tools.docker_sandbox import run_legacy_code_in_sandbox
+from tools.runtime_capture import capture_function_runtime
 
 load_dotenv()
 
-# Utilizing the GitHub Models endpoint you configured for prototyping
 chat_client = OpenAIChatClient(
     base_url=os.environ.get("GITHUB_ENDPOINT"),
     api_key=os.environ.get("GITHUB_TOKEN"),
@@ -18,17 +18,18 @@ chat_client = OpenAIChatClient(
 OBSERVER_NAME = "Observer"
 OBSERVER_INSTRUCTIONS = """
 You are the Observer agent for the Phoenix modernization system. 
-Your primary job is to analyze undocumented legacy software by executing it securely. 
-Use the `run_legacy_code_in_sandbox` tool to run the target legacy files. 
-Pass different `input_args` to test how the program reacts to various inputs, 
-and report the runtime outputs, errors, and stack traces back to the Analyst.
-Do not make assumptions about the code; only report the raw execution data.
+Your job is to analyze undocumented legacy software. 
+
+You have two tools:
+1. `run_legacy_code_in_sandbox`: Use this to run the entire script and see high-level terminal outputs.
+2. `capture_function_runtime`: Use this to surgically attach decorators to specific functions (e.g., 'process_transaction') to capture clean JSON data of inputs, outputs, and edge-case crashes.
+
+Pass diverse `test_inputs` (like positive numbers, negative numbers, strings, and zero) to uncover hidden bugs. Report the raw JSON execution data back to the Analyst.
 """
 
-# Instantiate the agent equipped strictly with the secure sandbox tool
 observer_agent = Agent(
     name=OBSERVER_NAME,
     instructions=OBSERVER_INSTRUCTIONS,
-    tools=[run_legacy_code_in_sandbox],
+    tools=[run_legacy_code_in_sandbox, capture_function_runtime],
     client=chat_client
 )
