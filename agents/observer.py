@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from tools.docker_sandbox import run_legacy_code_in_sandbox
 from tools.runtime_capture import capture_function_runtime
 
-from client import client
+from agents.client import client
 
 load_dotenv()
 

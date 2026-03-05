@@ -9,6 +9,6 @@ credential = AzureCliCredential()
 
 client = AzureOpenAIResponsesClient(
     project_endpoint=os.environ["AZURE_AI_PROJECT_ENDPOINT"],
-    deployment_name=os.environ["AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME"],
+    deployment_name=os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"],
     credential=credential,
 )

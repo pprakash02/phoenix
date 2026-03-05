@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from tools.critic_tools import verify_test_results, read_test_file
 from schemas.validation_report import CriticReport
 
-from client import client
+from agents.client import client
 
 load_dotenv()
 

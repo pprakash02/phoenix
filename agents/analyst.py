@@ -3,7 +3,7 @@ import os
 from agent_framework import Agent
 from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
-from client import client
+from agents.client import client
 
 from tools.analyst_tools import (
     parse_runtime_logs,

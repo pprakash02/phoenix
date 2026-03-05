@@ -1,2 +1,5 @@
 /.venv
 .env
+schemas/__pycache__/
+tools/__pycache__/
+agents/__pycache__/

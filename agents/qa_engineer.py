@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from tools.qa_tools import save_test_suite
 
-from client import client
+from agents.client import client
 
 load_dotenv()
 
