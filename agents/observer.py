@@ -7,14 +7,16 @@ from dotenv import load_dotenv
 from tools.docker_sandbox import run_legacy_code_in_sandbox
 from tools.runtime_capture import capture_function_runtime
 
+from client import client
+
 load_dotenv()
 
-chat_client = AzureOpenAIChatClient(
-    azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
-    api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
-    deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
-    api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
-)
+# chat_client = AzureOpenAIChatClient(
+#     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+#     api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+#     deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
+#     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
+# )
 
 
 OBSERVER_NAME = "Observer"
@@ -29,9 +31,11 @@ You have two tools:
 Pass diverse `test_inputs` (like positive numbers, negative numbers, strings, and zero) to uncover hidden bugs. Report the raw JSON execution data back to the Analyst.
 """
 
-observer_agent = Agent(
-    name=OBSERVER_NAME,
+observer_agent = client.as_agent(
+    name="Observer",
     instructions=OBSERVER_INSTRUCTIONS,
-    tools=[run_legacy_code_in_sandbox, capture_function_runtime],
-    client=chat_client
+    tools=[
+        run_legacy_code_in_sandbox,
+        capture_function_runtime,
+    ],
 )

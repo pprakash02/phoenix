@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 from tools.qa_tools import save_test_suite
 
+from client import client
+
 load_dotenv()
 
 chat_client = AzureOpenAIChatClient(
@@ -34,9 +36,8 @@ Rules:
 • After you receive the SUCCESS message from the `save_test_suite` tool, report back to the team that the file is ready.
 """
 
-qa_engineer_agent = Agent(
+qa_engineer_agent = client.as_agent(
     name="QA_Engineer",
     instructions=QA_INSTRUCTIONS,
     tools=[save_test_suite],
-    client=chat_client
 )

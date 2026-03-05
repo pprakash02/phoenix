@@ -7,14 +7,16 @@ from dotenv import load_dotenv
 from tools.critic_tools import verify_test_results, read_test_file
 from schemas.validation_report import CriticReport
 
+from client import client
+
 load_dotenv()
 
-chat_client = AzureOpenAIChatClient(
-    azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
-    api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
-    deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
-    api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
-)
+# chat_client = AzureOpenAIChatClient(
+#     azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+#     api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+#     deployment_name=os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
+#     api_version=os.environ.get("AZURE_OPENAI_API_VERSION")
+# )
 
 
 CRITIC_INSTRUCTIONS = """
@@ -33,10 +35,12 @@ You must return your findings in the structured CriticReport format.
 Only set 'is_approved' to True if all tests pass in the sandbox and coverage is 100%.
 """
 
-critic_agent = Agent(
+critic_agent = client.as_agent(
     name="Critic",
     instructions=CRITIC_INSTRUCTIONS,
-    tools=[verify_test_results, read_test_file],
-    client=chat_client,
+    tools=[
+        verify_test_results,
+        read_test_file,
+    ],
     output_schema=CriticReport
 )
