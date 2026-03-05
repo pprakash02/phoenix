@@ -1,17 +1,20 @@
 # tools/docker_sandbox.py
 import docker
 import os
-from typing import Annotated, List, Tuple, Dict, Optional
+from typing import Annotated, Dict, Optional
 from pydantic import Field
 from agent_framework import tool
 
+
 @tool(approval_mode="never_require")
 def run_legacy_code_in_sandbox(
-    file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
-    input_args: Annotated[str, Field(description="Command line arguments to pass to the script.")] = "",
-    extra_volumes: Annotated[List[Tuple[str, str]], Field(description="Additional (host_path, container_path) mounts.")] = [],
-    env: Annotated[Dict[str, str], Field(description="Environment variables for the container.")] = {},
-    command: Annotated[Optional[str], Field(description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None
+        file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
+        input_args: Annotated[str, Field(description="Command line arguments to pass to the script.")] = "",
+        extra_volumes: Annotated[Dict[str, str], Field(
+            description="Additional volumes to mount. Keys are host paths, values are container paths.")] = {},
+        env: Annotated[Dict[str, str], Field(description="Environment variables for the container.")] = {},
+        command: Annotated[Optional[str], Field(
+            description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None
 ) -> str:
     """
     Executes a legacy Python script securely inside an isolated, air-gapped Docker container.
@@ -32,7 +35,9 @@ def run_legacy_code_in_sandbox(
     volumes = {
         dir_name: {'bind': '/workspace', 'mode': 'ro'}
     }
-    for host_path, container_path in extra_volumes:
+
+    # Iterate over the dictionary items instead of a list of tuples
+    for host_path, container_path in extra_volumes.items():
         volumes[host_path] = {'bind': container_path, 'mode': 'ro'}
 
     # Determine the command to run
