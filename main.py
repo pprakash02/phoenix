@@ -5,7 +5,7 @@ import asyncio
 from agents.observer import observer_agent
 from agents.analyst import analyst_agent
 from agents.qa_engineer import qa_engineer_agent
-# from agents.critic import critic_agent
+from agents.critic import critic_agent
 
 # Import the framework's actual orchestration builder and typing
 from agent_framework.orchestrations import GroupChatBuilder, GroupChatState
