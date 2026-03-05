@@ -62,8 +62,10 @@ Workflow:
     print("[SYSTEM] Dispatching mission to Phoenix agents...\n")
 
     # Call the workflow's run method with the task or input you want the agents to work on[cite: 3937].
-    conversation = await workflow.run(mission_briefing)
-
+    conversation = await workflow.run(
+        mission_briefing,
+        options={"parallel_tool_calls": False}
+    )
     print("\n--- AGENT CONVERSATION ---\n")
 
     for message in conversation:
