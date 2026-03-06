@@ -35,6 +35,16 @@ APPROVAL CRITERIA:
 - If tests pass but minor style issues remain, still approve.
 - Be specific about what needs to change if you reject.
 - Do NOT repeat the same feedback more than once.
+
+FINAL RESPONSE — MANDATORY:
+After your tool calls complete, you MUST write your COMPLETE report as your final 
+text message. Include:
+- is_approved: true/false
+- Coverage assessment
+- Any hallucinations found
+- Test execution results
+- Specific feedback for QA_Engineer if rejected
+Do NOT return an empty message. The QA_Engineer needs your written feedback to improve.
 """
 
 critic_agent = client.as_agent(
@@ -44,4 +54,7 @@ critic_agent = client.as_agent(
         verify_test_results,
         read_test_file,
     ],
+    default_options={
+        "temperature": 0,
+    },
 )
