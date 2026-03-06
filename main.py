@@ -81,24 +81,51 @@ from agents.critic import critic_agent
 from agent_framework.orchestrations import GroupChatBuilder, GroupChatState
 
 
-def round_robin_router(state: GroupChatState):
+def phoenix_router(state: GroupChatState):
     """
-    Controls which agent speaks next.
+    Controls which agent speaks next with Critic↔QA feedback loops.
 
-    Order:
-    0 → Observer
-    1 → Analyst
-    2 → QA Engineer
-    3 → Critic
+    Initial pass (rounds 0-3):
+        Observer → Analyst → QA_Engineer → Critic
+
+    Feedback loop (rounds 4+):
+        If the Critic rejected → QA_Engineer → Critic → repeat
+        If the Critic approved → END
     """
-
     order = ["Observer", "Analyst", "QA_Engineer", "Critic"]
 
+    # Initial sequential pass
     if state.current_round < len(order):
         return order[state.current_round]
 
-    # Fallback — max_rounds should prevent reaching here
-    return order[-1]
+    # --- Feedback loop phase ---
+    # Look at the last message to decide what happens next
+    conversation = state.conversation
+    if conversation:
+        last_content = ""
+        last_author = ""
+        for msg in reversed(conversation):
+            text = msg.text or ""
+            author = msg.author_name or ""
+            if text.strip():
+                last_content = text
+                last_author = author
+                break
+
+        # If the Critic just spoke and approved, we're done
+        if last_author == "Critic" and '"is_approved": true' in last_content:
+            return GroupChatBuilder.END
+
+        # If the Critic just spoke and rejected, send to QA_Engineer to fix
+        if last_author == "Critic":
+            return "QA_Engineer"
+
+        # If QA_Engineer just spoke (after a fix), send back to Critic
+        if last_author == "QA_Engineer":
+            return "Critic"
+
+    # Safety fallback
+    return GroupChatBuilder.END
 
 
 async def run_phoenix() -> None:
@@ -112,8 +139,8 @@ async def run_phoenix() -> None:
             qa_engineer_agent,
             critic_agent,
         ],
-        selection_func=round_robin_router,
-        max_rounds=10,  # enough headroom for 4 agents plus any retries
+        selection_func=phoenix_router,
+        max_rounds=20,  # headroom for 4 agents + up to 3 Critic↔QA retry cycles
     ).build()
 
     mission_briefing = """

@@ -77,6 +77,17 @@ def summarize_execution_results(logs: List[Dict[str, Any]]) -> Dict:
     Convert runtime logs into behavioral specification.
     """
 
+    def _safe_value(val):
+        """Convert non-standard floats to strings for safe JSON serialization."""
+        if isinstance(val, float):
+            if val == float('inf'):
+                return "Infinity"
+            if val == float('-inf'):
+                return "-Infinity"
+            if val != val:  # NaN check
+                return "NaN"
+        return val
+
     successes = []
     crashes = []
     edges = []
@@ -87,7 +98,7 @@ def summarize_execution_results(logs: List[Dict[str, Any]]) -> Dict:
         if log["status"] == "success":
             successes.append({
                 "input": inp,
-                "output": log["output"]
+                "output": _safe_value(log["output"])
             })
         else:
             crashes.append({

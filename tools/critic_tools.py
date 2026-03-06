@@ -35,6 +35,7 @@ def verify_test_results(
     """
     Runs the generated test suite in the Docker sandbox to confirm it passes.
     Uses a custom Docker image with pytest pre-installed. Auto-builds the image if missing.
+    Returns the full pytest output (stdout + stderr) regardless of pass/fail.
     """
     test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
     legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
@@ -44,7 +45,11 @@ def verify_test_results(
 
     print(f"\n[SYSTEM] Running test verification for {test_file_name}...\n")
 
-    docker_client = docker.from_env()
+    try:
+        docker_client = docker.from_env()
+    except docker.errors.DockerException:
+        return "System Error: Docker daemon is not running on the host. Please start Docker."
+
     _ensure_test_runner_image(docker_client)
 
     volumes = {
@@ -52,23 +57,33 @@ def verify_test_results(
         legacy_dir: {'bind': '/legacy', 'mode': 'ro'},
     }
 
-    cmd = f"pytest /workspace/{test_file_name} -v"
+    cmd = f"pytest /workspace/{test_file_name} -v --tb=short"
 
     try:
-        output = docker_client.containers.run(
+        # Use detach mode to capture FULL output (stdout+stderr) regardless of exit code
+        container = docker_client.containers.create(
             image=TEST_RUNNER_IMAGE,
             command=cmd,
             volumes=volumes,
             environment={'PYTHONPATH': '/legacy'},
-            remove=True,
             network_disabled=True,
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000
         )
-        return output.decode("utf-8", errors="replace")
-    except docker.errors.ContainerError as e:
-        return f"Execution Failed with Exit Code {e.exit_status}.\n{e.stderr.decode('utf-8', errors='replace') if e.stderr else str(e)}"
+        container.start()
+        result = container.wait(timeout=60)
+        # Capture both stdout and stderr
+        logs = container.logs(stdout=True, stderr=True)
+        container.remove()
+
+        output = logs.decode("utf-8", errors="replace")
+        exit_code = result.get("StatusCode", -1)
+
+        if exit_code == 0:
+            return f"ALL TESTS PASSED.\n\n{output}"
+        else:
+            return f"TESTS FAILED (exit code {exit_code}).\n\n{output}"
     except Exception as e:
         return f"Docker Error: {str(e)}"
 
