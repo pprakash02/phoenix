@@ -14,7 +14,9 @@ def run_legacy_code_in_sandbox(
             description="Additional volumes to mount. Keys are host paths, values are container paths.")] = {},
         env: Annotated[Dict[str, str], Field(description="Environment variables for the container.")] = {},
         command: Annotated[Optional[str], Field(
-            description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None
+            description="Override the default command (e.g., 'pytest /workspace/test.py').")] = None,
+        network_disabled: Annotated[bool, Field(
+            description="Whether to disable network access in the container.")] = True
 ) -> str:
     """
     Executes a legacy Python script securely inside an isolated, air-gapped Docker container.
@@ -54,7 +56,7 @@ def run_legacy_code_in_sandbox(
             volumes=volumes,
             environment=env,
             remove=True,
-            network_disabled=True,
+            network_disabled=network_disabled,
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000

@@ -28,7 +28,8 @@ def verify_test_results(
         input_args="",          # not used because we override command
         extra_volumes=extra_volumes,
         env=env,
-        command=cmd
+        command=cmd,
+        network_disabled=False  # allow network to install pytest
     )
 
 
