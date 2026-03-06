@@ -42,21 +42,17 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
 
     Workflow:
     1. Observer:
-       - For EACH legacy file listed above:
-         a. Run `run_legacy_code_in_sandbox` with `cat /workspace/<filename>` to read its source code.
-         b. Identify ALL functions defined in the file.
-         c. For each function, generate 5-10 diverse test inputs including edge cases
-            (negatives, zero, empty strings, large numbers, None, whitespace) based on
-            your analysis of the function's logic.
-         d. Execute `capture_function_runtime` for each function using your generated inputs.
-       - Report ALL raw JSON runtime data.
+       - For EACH .py file listed above (ONLY .py files — do NOT read .txt or other data files):
+         a. Run `run_legacy_code_in_sandbox` with command `cat /workspace/<filename.py>` to read the source.
+         b. Identify ALL testable functions (skip interactive functions that use input()).
+         c. For each testable function, call `capture_function_runtime` with 5-10 diverse test inputs.
+       - Your final message MUST contain all the raw JSON runtime capture data.
 
-    2. Analyst: Parse all runtime logs to create a full behavioral specification
-       for every function in every file.
+    2. Analyst: Parse the Observer's runtime logs to create a behavioral specification
+       for every captured function.
 
-    3. QA Engineer: Convert the entire specification into production-ready PyTest suites
-       covering all identified functions. Save one test file per legacy module
-       (e.g., legacy_billing.py → test_legacy_billing.py).
+    3. QA Engineer: Convert the specification into production-ready PyTest suites
+       covering all identified functions. Save one test file per legacy module.
 
     4. Critic: Verify the suites in the sandbox, ensure 100% coverage of ALL observed
        behavior, and approve or reject with specific feedback.
