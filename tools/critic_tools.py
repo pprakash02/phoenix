@@ -32,16 +32,16 @@ def verify_test_results(
         legacy_dir: {'bind': '/legacy', 'mode': 'ro'},
     }
 
-    cmd = f"sh -c 'pip install --quiet pytest && pytest /workspace/{test_file_name} -v'"
+    cmd = f"pytest /workspace/{test_file_name} -v"
 
     try:
         output = docker_client.containers.run(
-            image="python:3.10-slim",
+            image="phoenix-test-runner",
             command=cmd,
             volumes=volumes,
             environment={'PYTHONPATH': '/legacy'},
             remove=True,
-            network_disabled=False,  # network ON to install pytest
+            network_disabled=True,  # no network needed, pytest is in the image
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000
