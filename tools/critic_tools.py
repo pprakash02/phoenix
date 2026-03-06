@@ -38,7 +38,8 @@ def verify_test_results(
     Returns the full pytest output (stdout + stderr) regardless of pass/fail.
     """
     test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
-    legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
+    # Mount the project root so `from legacy_workspace.legacy_billing import ...` resolves
+    project_root = os.path.abspath(".")
 
     if not os.path.isfile(test_path):
         return f"ERROR: Test file not found: {test_path}"
@@ -50,22 +51,24 @@ def verify_test_results(
     except docker.errors.DockerException:
         return "System Error: Docker daemon is not running on the host. Please start Docker."
 
-    _ensure_test_runner_image(docker_client)
+    try:
+        _ensure_test_runner_image(docker_client)
+    except Exception as e:
+        return f"Docker Error: Failed to build test-runner image: {str(e)}"
 
     volumes = {
         GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
-        legacy_dir: {'bind': '/legacy', 'mode': 'ro'},
+        project_root: {'bind': '/project', 'mode': 'ro'},
     }
 
     cmd = f"pytest /workspace/{test_file_name} -v --tb=short"
 
     try:
-        # Use detach mode to capture FULL output (stdout+stderr) regardless of exit code
         container = docker_client.containers.create(
             image=TEST_RUNNER_IMAGE,
             command=cmd,
             volumes=volumes,
-            environment={'PYTHONPATH': '/legacy'},
+            environment={'PYTHONPATH': '/project'},
             network_disabled=True,
             mem_limit="256m",
             cpu_period=100000,
@@ -73,7 +76,6 @@ def verify_test_results(
         )
         container.start()
         result = container.wait(timeout=60)
-        # Capture both stdout and stderr
         logs = container.logs(stdout=True, stderr=True)
         container.remove()
 
