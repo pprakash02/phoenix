@@ -20,7 +20,7 @@ def verify_test_results(
     cmd = f"sh -c 'pip install --quiet pytest && pytest /workspace/{test_file_name} -v'"
 
     # Mount legacy directory as /legacy and set PYTHONPATH so imports work
-    extra_volumes = [(legacy_dir, '/legacy')]
+    extra_volumes = {legacy_dir: '/legacy'}
     env = {'PYTHONPATH': '/legacy'}
 
     return run_legacy_code_in_sandbox(

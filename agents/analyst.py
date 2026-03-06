@@ -65,6 +65,8 @@ analyst_agent: Agent = client.as_agent(
         detect_function,
         summarize_execution_results,
     ],
-    output_schema=AnalystOutput,
-    temperature=0
+    default_options={
+        "response_format": AnalystOutput,
+        "temperature": 0,
+    },
 )

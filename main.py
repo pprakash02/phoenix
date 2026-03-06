@@ -94,11 +94,11 @@ def round_robin_router(state: GroupChatState):
 
     order = ["Observer", "Analyst", "QA_Engineer", "Critic"]
 
-    # Prevent out-of-range errors
-    if state.current_round >= len(order):
-        return order[-1]
+    if state.current_round < len(order):
+        return order[state.current_round]
 
-    return order[state.current_round]
+    # Fallback — max_rounds should prevent reaching here
+    return order[-1]
 
 
 async def run_phoenix() -> None:
@@ -113,7 +113,7 @@ async def run_phoenix() -> None:
             critic_agent,
         ],
         selection_func=round_robin_router,
-        max_rounds=10,  # critical fix to stop workflow
+        max_rounds=4,  # exactly 4 rounds for 4 agents
     ).build()
 
     mission_briefing = """
@@ -135,29 +135,14 @@ async def run_phoenix() -> None:
 
     print("[SYSTEM] Dispatching mission to Phoenix agents...\n")
 
-    conversation = await workflow.run(
-        mission_briefing,
-        options={"parallel_tool_calls": False}
-    )
+    result = await workflow.run(mission_briefing)
 
     print("\n--- AGENT CONVERSATION ---\n")
 
-    for event in conversation:
-
-        # Only process output events
-        if getattr(event, "type", None) != "output":
-            continue
-
-        messages = event.data
-
+    for messages in result.get_outputs():
         for msg in messages:
-            author = getattr(
-                msg,
-                "speaker",
-                getattr(msg, "name", getattr(msg, "author_name", "Agent")),
-            )
-
-            content = getattr(msg, "content", None) or getattr(msg, "text", None)
+            author = getattr(msg, "author_name", None) or getattr(msg, "name", "Agent")
+            content = getattr(msg, "text", None) or getattr(msg, "content", None)
 
             if content:
                 print(f"[{author}]")
