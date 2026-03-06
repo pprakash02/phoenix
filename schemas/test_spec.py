@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Any
+from typing import Dict, List, Any
 
 
 class TestSpec(BaseModel):
@@ -8,6 +8,8 @@ class TestSpec(BaseModel):
     expected_result: Any
 
 class AnalystOutput(BaseModel):
-    function_under_test: str
+    function_name: str
     business_logic_summary: str
-    test_specs: List[TestSpec]
+    successful_mappings: List[Dict[str, Any]]
+    crashes: List[Dict[str, Any]]
+    edge_cases: List[Dict[str, Any]]

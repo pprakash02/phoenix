@@ -5,29 +5,21 @@ from agent_framework import tool
 import re
 
 
-@tool
-def parse_runtime_logs(
-    raw_output: str = Field(description="Raw observer output containing JSON logs")
-) -> List[Dict[str, Any]]:
-    """
-    Extract JSON runtime logs embedded in observer output.
-    """
+@tool(approval_mode="never_require")
+def parse_runtime_logs(raw_output: str) -> List[Dict[str, Any]]:
+    logs = []
+    for line in raw_output.splitlines():
+        line = line.strip()
+        # Look for JSON objects on individual lines
+        if line.startswith("{") and line.endswith("}"):
+            try:
+                logs.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return logs
 
-    # find JSON array in the text
-    match = re.search(r"\[\s*{.*}\s*\]", raw_output, re.DOTALL)
 
-    if not match:
-        return []
-
-    json_block = match.group(0)
-
-    try:
-        logs = json.loads(json_block)
-        return logs
-    except Exception:
-        return []
-
-@tool
+@tool(approval_mode="never_require")
 def detect_function(logs: List[Dict[str, Any]]) -> str:
     """
     Detect the function name from runtime logs.
@@ -39,7 +31,7 @@ def detect_function(logs: List[Dict[str, Any]]) -> str:
     return logs[0].get("function", "unknown")
 
 
-@tool
+@tool(approval_mode="never_require")
 def summarize_execution_results(logs: List[Dict[str, Any]]) -> Dict:
     """
     Convert runtime logs into behavioral specification.

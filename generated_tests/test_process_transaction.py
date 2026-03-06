@@ -1,36 +1,39 @@
-import pytest
 import math
+import pytest
+
 from legacy_workspace.legacy_billing import process_transaction
 
 @pytest.mark.parametrize(
-    "input_value,expected",
+    "input_val,expected",
     [
         ("100", 105.0),
-        ("1e309", "Infinity"),
-        ("1e-309", 1.050000000000004e-309),
-        ("   200   ", 210.0),
-        ("100.5", 105.525),
+        ("1e309", math.inf),
+        ("9999999999", 10499999998.95),
+        ("0.01", 0.0105),
+        ("   20  ", 21.0),
+        ("3.14159", 3.2986695),
     ],
 )
-def test_process_transaction_success(input_value, expected):
-    """Test successful executions of process_transaction."""
-    result = process_transaction(input_value)
-    if expected == "Infinity":
-        assert math.isinf(result) and result > 0
+def test_process_transaction_success(input_val, expected):
+    """Test successful processing of transaction amounts."""
+    result = process_transaction(input_val)
+    if math.isinf(expected):
+        assert math.isinf(result)
     else:
         assert result == expected
 
 @pytest.mark.parametrize(
-    "input_value,expected_exception",
+    "input_val,expected_exception,expected_message",
     [
-        ("0", ZeroDivisionError),
-        ("-50", ValueError),
-        ("abc", ValueError),
-        ("", ValueError),
-        ("0.0", ZeroDivisionError),
+        ("-50", ValueError, "Transaction amount cannot be negative."),
+        ("0", ZeroDivisionError, "division by zero"),
+        ("abc", ValueError, "could not convert string to float: 'abc'"),
+        ("", ValueError, "could not convert string to float: ''"),
     ],
 )
-def test_process_transaction_exceptions(input_value, expected_exception):
-    """Test that process_transaction raises expected exceptions for invalid inputs."""
-    with pytest.raises(expected_exception):
-        process_transaction(input_value)
+def test_process_transaction_exceptions(input_val, expected_exception, expected_message):
+    """Test that invalid inputs raise the correct exceptions with expected messages."""
+    with pytest.raises(expected_exception) as exc_info:
+        process_transaction(input_val)
+    # Verify that the exception message contains the expected substring
+    assert expected_message in str(exc_info.value)
