@@ -1,9 +1,12 @@
 # tools/critic_tools.py
 import os
+import docker
 from typing import Annotated
 from pydantic import Field
 from agent_framework import tool
-from tools.docker_sandbox import run_legacy_code_in_sandbox
+
+GENERATED_TESTS_DIR = os.path.abspath("generated_tests")
+LEGACY_WORKSPACE = os.path.abspath("legacy_workspace")
 
 @tool(approval_mode="never_require")
 def verify_test_results(
@@ -12,25 +15,42 @@ def verify_test_results(
 ) -> str:
     """
     Runs the generated test suite in the Docker sandbox to confirm it passes.
+    Uses Docker directly with network enabled so pytest can be installed.
     """
-    test_path = os.path.abspath(os.path.join("generated_tests", test_file_name))
+    test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
     legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
 
-    # Command to install pytest and run the test file
+    if not os.path.isfile(test_path):
+        return f"ERROR: Test file not found: {test_path}"
+
+    print(f"\n[SYSTEM] Running test verification for {test_file_name}...\n")
+
+    docker_client = docker.from_env()
+
+    volumes = {
+        GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
+        legacy_dir: {'bind': '/legacy', 'mode': 'ro'},
+    }
+
     cmd = f"sh -c 'pip install --quiet pytest && pytest /workspace/{test_file_name} -v'"
 
-    # Mount legacy directory as /legacy and set PYTHONPATH so imports work
-    extra_volumes = {legacy_dir: '/legacy'}
-    env = {'PYTHONPATH': '/legacy'}
-
-    return run_legacy_code_in_sandbox(
-        file_path=test_path,
-        input_args="",          # not used because we override command
-        extra_volumes=extra_volumes,
-        env=env,
-        command=cmd,
-        network_disabled=False  # allow network to install pytest
-    )
+    try:
+        output = docker_client.containers.run(
+            image="python:3.10-slim",
+            command=cmd,
+            volumes=volumes,
+            environment={'PYTHONPATH': '/legacy'},
+            remove=True,
+            network_disabled=False,  # network ON to install pytest
+            mem_limit="256m",
+            cpu_period=100000,
+            cpu_quota=50000
+        )
+        return output.decode("utf-8", errors="replace")
+    except docker.errors.ContainerError as e:
+        return f"Execution Failed with Exit Code {e.exit_status}.\n{e.stderr.decode('utf-8', errors='replace') if e.stderr else str(e)}"
+    except Exception as e:
+        return f"Docker Error: {str(e)}"
 
 
 @tool(approval_mode="never_require")
