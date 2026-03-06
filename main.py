@@ -1,4 +1,5 @@
 import asyncio
+import ast
 import glob
 import os
 
@@ -21,41 +22,109 @@ def discover_legacy_files() -> list[str]:
     """
     pattern = os.path.join(LEGACY_WORKSPACE, "**", "*.py")
     abs_paths = glob.glob(pattern, recursive=True)
-    # Return paths relative to CWD, excluding non-code files
     return sorted(
         os.path.relpath(p) for p in abs_paths
         if "__pycache__" not in p and os.path.basename(p) != "__init__.py"
     )
 
 
+def extract_functions(file_path: str) -> list[dict]:
+    """
+    Parse a Python file's AST to extract function definitions.
+    Returns a list of dicts with name, args, and whether the function is testable.
+    """
+    with open(file_path, "r", encoding="utf-8") as f:
+        source = f.read()
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+
+    functions = []
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, ast.FunctionDef):
+            args = [a.arg for a in node.args.args]
+
+            # Check if function uses input() — not testable
+            uses_input = any(
+                isinstance(n, ast.Call)
+                and isinstance(getattr(n, "func", None), ast.Name)
+                and n.func.id == "input"
+                for n in ast.walk(node)
+            )
+
+            functions.append({
+                "name": node.name,
+                "args": args,
+                "testable": not uses_input,
+                "reason": "uses input()" if uses_input else "ok",
+            })
+
+    return functions
+
+
 def build_mission_briefing(legacy_files: list[str]) -> str:
     """
-    Generate a dynamic mission briefing listing all discovered legacy files.
+    Generate a dynamic mission briefing with pre-read source code and function lists.
     """
-    file_list = "\n".join(f"    - {f}" for f in legacy_files)
+    file_sections = []
+
+    for fpath in legacy_files:
+        # Read source code
+        with open(fpath, "r", encoding="utf-8") as f:
+            source = f.read()
+
+        # Extract functions
+        funcs = extract_functions(fpath)
+        fname = os.path.basename(fpath)
+
+        testable = [fn for fn in funcs if fn["testable"]]
+        skipped = [fn for fn in funcs if not fn["testable"]]
+
+        func_list = ""
+        for fn in testable:
+            args_str = ", ".join(fn["args"])
+            func_list += f"       - {fn['name']}({args_str})  [TESTABLE]\n"
+        for fn in skipped:
+            args_str = ", ".join(fn["args"])
+            func_list += f"       - {fn['name']}({args_str})  [SKIP: {fn['reason']}]\n"
+
+        section = f"""
+    === {fpath} ===
+    Functions found:
+{func_list}
+    Source code:
+    ```python
+{source}
+    ```
+"""
+        file_sections.append(section)
+
+    all_sections = "\n".join(file_sections)
 
     return f"""
     Team Phoenix,
 
-    We need to modernize the following undocumented legacy scripts:
-{file_list}
+    We need to modernize the following undocumented legacy scripts.
+    The source code and function lists are provided below — do NOT waste tool calls reading files.
+{all_sections}
 
     Workflow:
     1. Observer:
-       - For EACH .py file listed above (ONLY .py files — do NOT read .txt or other data files):
-         a. Run `run_legacy_code_in_sandbox` with command `cat /workspace/<filename.py>` to read the source.
-         b. Identify ALL testable functions (skip interactive functions that use input()).
-         c. For each testable function, call `capture_function_runtime` with 5-10 diverse test inputs.
-       - Your final message MUST contain all the raw JSON runtime capture data.
+       - The source code is ALREADY provided above. Do NOT call cat or read any files.
+       - For each function marked [TESTABLE], call `capture_function_runtime` with 5-10
+         diverse test inputs based on the source code logic.
+       - For MULTI-argument functions: pass test_inputs as a list of argument LISTS, e.g.
+         [["arg1", "arg2"], ["arg1b", "arg2b"]]
+       - For SINGLE-argument functions: pass a flat list, e.g. ["val1", "val2"]
+       - Your final message MUST include all raw JSON runtime data.
 
-    2. Analyst: Parse the Observer's runtime logs to create a behavioral specification
-       for every captured function.
+    2. Analyst: Parse the Observer's runtime logs into a behavioral specification.
 
-    3. QA Engineer: Convert the specification into production-ready PyTest suites
-       covering all identified functions. Save one test file per legacy module.
+    3. QA Engineer: Convert the specification into PyTest suites. Save one test file per module.
 
-    4. Critic: Verify the suites in the sandbox, ensure 100% coverage of ALL observed
-       behavior, and approve or reject with specific feedback.
+    4. Critic: Verify the suites in the sandbox, ensure 100% coverage, and approve/reject.
     """
 
 
@@ -68,14 +137,12 @@ def round_robin_router(state: GroupChatState):
 
     Iterative fix loop (rounds 4+):
         QA_Engineer → Critic → QA_Engineer → Critic → ...
-        (so QA can fix tests based on Critic feedback)
     """
     order = ["Observer", "Analyst", "QA_Engineer", "Critic"]
 
     if state.current_round < len(order):
         return order[state.current_round]
 
-    # After initial pipeline, alternate QA_Engineer ↔ Critic
     iteration = (state.current_round - len(order)) % 2
     return "QA_Engineer" if iteration == 0 else "Critic"
 
@@ -93,7 +160,10 @@ async def run_phoenix() -> None:
 
     print(f"[SYSTEM] Discovered {len(legacy_files)} legacy file(s):")
     for f in legacy_files:
-        print(f"         → {f}")
+        funcs = extract_functions(f)
+        testable = [fn for fn in funcs if fn["testable"]]
+        skipped = [fn for fn in funcs if not fn["testable"]]
+        print(f"         → {f}  ({len(testable)} testable, {len(skipped)} skipped)")
     print()
 
     # Build the group chat workflow
@@ -105,7 +175,7 @@ async def run_phoenix() -> None:
             critic_agent,
         ],
         selection_func=round_robin_router,
-        max_rounds=12,  # 4 initial + up to 4 QA↔Critic iterations
+        max_rounds=12,
     ).build()
 
     mission_briefing = build_mission_briefing(legacy_files)
