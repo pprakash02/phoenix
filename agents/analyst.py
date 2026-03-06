@@ -74,7 +74,6 @@ analyst_agent: Agent = client.as_agent(
         summarize_execution_results,
     ],
     default_options={
-        "response_format": AnalystOutput,
         "temperature": 0,
     },
 )

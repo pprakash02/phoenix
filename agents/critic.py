@@ -35,5 +35,4 @@ critic_agent = client.as_agent(
         verify_test_results,
         read_test_file,
     ],
-    output_schema=CriticReport
 )
