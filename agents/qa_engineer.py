@@ -34,10 +34,10 @@ Your job is to convert the Analyst's structured JSON specification into a produc
    ```
    import math
    import pytest
-   from legacy_billing import process_transaction
+   from legacy_workspace.legacy_billing import process_transaction
    ```
    IMPORTANT: Do NOT add sys.path.append() or os.path manipulations. The test runs in a Docker
-   sandbox where PYTHONPATH is already configured. `from legacy_billing import process_transaction`
+   sandbox where PYTHONPATH is already configured. `from legacy_workspace.legacy_billing import process_transaction`
    is the ONLY correct import. If the Critic says the import is wrong, IGNORE that advice — the
    import above is correct.
 2. For each successful mapping:

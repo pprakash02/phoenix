@@ -41,10 +41,6 @@ def phoenix_router(state: GroupChatState):
                 last_author = author
                 break
 
-        # If the Critic just spoke and approved, we're done
-        if last_author == "Critic" and '"is_approved": true' in last_content:
-            return GroupChatBuilder.END
-
         # If the Critic just spoke and rejected, send to QA_Engineer to fix
         if last_author == "Critic":
             return "QA_Engineer"
@@ -54,7 +50,22 @@ def phoenix_router(state: GroupChatState):
             return "Critic"
 
     # Safety fallback
-    return GroupChatBuilder.END
+    return "Observer"
+
+def is_mission_accomplished(conversation) -> bool:
+    """Termination condition: Stop when Critic approves."""
+    if not conversation:
+        return False
+    last_msg = conversation[-1]
+    last_content = last_msg.text or ""
+    last_author = getattr(last_msg, "author_name", "") or ""
+    
+    # Fallback to msg.contents for agent_framework sometimes
+    if not last_content and hasattr(last_msg, "contents") and last_msg.contents:
+        parts = [str(getattr(c, "text", None) or getattr(c, "value", None) or c) for c in last_msg.contents]
+        last_content = "\n".join(parts)
+        
+    return last_author == "Critic" and '"is_approved": true' in last_content
 
 
 async def run_phoenix() -> None:
@@ -70,6 +81,7 @@ async def run_phoenix() -> None:
         ],
         selection_func=phoenix_router,
         max_rounds=20,  # headroom for 4 agents + up to 3 Critic↔QA retry cycles
+        termination_condition=is_mission_accomplished,
     ).build()
 
     mission_briefing = """

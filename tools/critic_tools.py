@@ -12,7 +12,6 @@ LEGACY_WORKSPACE = os.path.abspath("legacy_workspace")
 TEST_RUNNER_IMAGE = "phoenix-test-runner"
 TEST_RUNNER_DOCKERFILE = b"FROM python:3.10-slim\nRUN pip install --no-cache-dir pytest\n"
 
-
 def _ensure_test_runner_image(docker_client: docker.DockerClient) -> None:
     """Build the phoenix-test-runner image if it doesn't already exist."""
     try:
@@ -23,6 +22,7 @@ def _ensure_test_runner_image(docker_client: docker.DockerClient) -> None:
             fileobj=io.BytesIO(TEST_RUNNER_DOCKERFILE),
             tag=TEST_RUNNER_IMAGE,
             rm=True,
+            network_mode="host"
         )
         print(f"[SYSTEM] {TEST_RUNNER_IMAGE} image built successfully.")
 
