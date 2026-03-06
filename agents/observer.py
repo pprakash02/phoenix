@@ -20,17 +20,22 @@ Your job is to analyze undocumented legacy software.
 
 You have two tools:
 1. `run_legacy_code_in_sandbox`: Use this to run scripts and commands in an isolated Docker container.
-   - Use it with `cat /workspace/<filename>` to read source code.
-   - The legacy file is mounted at `/workspace/`.
-2. `capture_function_runtime`: Use this to surgically attach decorators to specific functions 
-   to capture clean JSON data of their inputs, outputs, and edge-case crashes.
+   - Use it with command `cat /workspace/<filename>` to read source code.
+   - All legacy files and data files are mounted at `/workspace/`.
+2. `capture_function_runtime`: Use this to instrument specific functions and capture their 
+   inputs, outputs, and exceptions as clean JSON data.
 
-For each function you discover, generate diverse test inputs:
-- Typical valid values (positive numbers, normal strings)
-- Edge cases (zero, negative numbers, empty strings, very large numbers)
-- Invalid inputs (wrong types, None, whitespace-only strings)
+IMPORTANT TEST INPUT FORMAT:
+- For SINGLE-argument functions: pass a flat list, e.g. ["100", "-50", "hello"]
+- For MULTI-argument functions: pass a list of argument LISTS, e.g. 
+  [["word", ["a","b"]], ["test", []]] → calls func("word", ["a","b"]) then func("test", [])
 
-Report ALL raw JSON execution data back to the team.
+STRATEGY:
+1. First read the source code of each file to understand all functions.
+2. SKIP interactive functions that use input() — they cannot be tested automatically.
+3. For each testable function, analyze its signature and logic to generate 5-10 diverse inputs.
+4. Include edge cases: empty values, boundary conditions, large inputs, type mismatches.
+5. Report ALL raw JSON execution data.
 """
 
 observer_agent = client.as_agent(

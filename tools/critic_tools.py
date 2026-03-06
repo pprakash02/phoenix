@@ -62,6 +62,7 @@ def verify_test_results(
             environment={'PYTHONPATH': '/legacy'},
             remove=True,
             network_disabled=True,
+            working_dir="/legacy",
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000

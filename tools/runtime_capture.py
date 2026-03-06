@@ -1,6 +1,7 @@
 # tools/runtime_capture.py
 import os
-from typing import Annotated
+import json
+from typing import Annotated, Any
 from pydantic import Field
 from agent_framework import tool
 from tools.docker_sandbox import run_legacy_code_in_sandbox
@@ -8,12 +9,15 @@ from tools.docker_sandbox import run_legacy_code_in_sandbox
 @tool(approval_mode="never_require")
 def capture_function_runtime(
     file_path: Annotated[str, Field(description="The absolute or relative path to the legacy Python file.")],
-    function_name: Annotated[str, Field(description="The specific function to instrument (e.g., process_transaction).")],
-    test_inputs: Annotated[list[str], Field(description="A list of string inputs to pass to the function.")]
+    function_name: Annotated[str, Field(description="The specific function to instrument.")],
+    test_inputs: Annotated[list, Field(description="""A list of test inputs. Each element is the argument(s) for one call:
+- Single-argument function: each element is the value itself, e.g. ["100", "-50", "0"]
+- Multi-argument function: each element is a LIST of positional args, e.g. [["hello", ["a","b"]], ["world", []]]""")]
 ) -> str:
     """
     Dynamically attaches a decorator to a legacy function to capture its exact inputs,
     outputs, and exceptions. Runs the instrumented code securely in the Docker sandbox.
+    Supports functions with any number of arguments.
     """
     abs_path = os.path.abspath(file_path)
     dir_name = os.path.dirname(abs_path)
@@ -22,6 +26,9 @@ def capture_function_runtime(
     # We create a temporary script inside the legacy workspace
     harness_path = os.path.join(dir_name, "phoenix_harness.py")
 
+    # Serialize test_inputs as JSON so it can be safely embedded in the harness
+    test_inputs_json = json.dumps(test_inputs)
+
     # This Python script injects the decorator into the legacy code at runtime
     harness_code = f"""
 import sys
@@ -29,6 +36,7 @@ import json
 import traceback
 
 sys.path.append('/workspace')
+
 import {module_name}
 
 # The decorator that captures live runtime data
@@ -50,7 +58,7 @@ def runtime_logger(func):
             capture_data["error"] = f"{{type(e).__name__}}: {{str(e)}}"
             capture_data["traceback"] = traceback.format_exc()
         finally:
-            print(json.dumps(capture_data))
+            print(json.dumps(capture_data, default=str))
     return wrapper
 
 # Monkey-patch the legacy module with the decorator
@@ -61,10 +69,18 @@ else:
     print(json.dumps({{"error": "Function {function_name} not found."}}))
     sys.exit(1)
 
-# Execute the test inputs provided by the Observer
-for inp in {test_inputs}:
+# Load test inputs from embedded JSON
+test_inputs = json.loads('''{test_inputs_json}''')
+
+# Execute each test input
+for inp in test_inputs:
     try:
-        getattr({module_name}, "{function_name}")(inp)
+        if isinstance(inp, (list, tuple)):
+            # Multi-argument: unpack the list as positional args
+            getattr({module_name}, "{function_name}")(*inp)
+        else:
+            # Single argument: pass directly
+            getattr({module_name}, "{function_name}")(inp)
     except BaseException:
         pass
 """

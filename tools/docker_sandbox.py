@@ -57,6 +57,7 @@ def run_legacy_code_in_sandbox(
             environment=env,
             remove=True,
             network_disabled=network_disabled,
+            working_dir="/workspace",
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000
