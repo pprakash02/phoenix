@@ -42,26 +42,26 @@ Call `summarize_execution_results` to classify the runtime results into:
 - crashes
 - edge cases
 
-STEP 4
-Return the final structured JSON specification.
+STEP 4 — CRITICAL
+After you receive the results from all tool calls above, you MUST write out 
+the COMPLETE behavioral specification as your final message. 
 
-The JSON MUST contain the following fields:
+The specification MUST be a JSON object with these exact fields:
 
 {
-  "function_name": "<the actual legacy function name, e.g. process_transaction>",
+  "function_name": "<the actual legacy function name>",
   "business_logic_summary": "<short description of what the function does>",
-  "successful_mappings": [...],
-  "crashes": [...],
+  "successful_mappings": [{"input": "...", "output": ...}, ...],
+  "crashes": [{"input": "...", "error": "..."}, ...],
   "edge_cases": [...]
 }
 
-Rules:
-- Always use the provided tools.
-- Do NOT invent outputs.
-- The final response MUST be valid JSON.
-- Do NOT include explanations.
-- The function_name must be the LEGACY function name (e.g. "process_transaction"),
+IMPORTANT:
+- You MUST write the full JSON as your response text. Do NOT return an empty message.
+- Use the EXACT data returned by your tools. Do NOT invent data.
+- The function_name must be the LEGACY function name as found in the source code,
   NOT the name of an Analyst tool.
+- Include ALL entries from the tool results in your final JSON.
 """
 
 
