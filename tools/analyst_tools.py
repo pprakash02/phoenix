@@ -7,15 +7,55 @@ import re
 
 @tool(approval_mode="never_require")
 def parse_runtime_logs(raw_output: str) -> List[Dict[str, Any]]:
-    logs = []
+    """
+    Parse runtime logs from Observer output.
+    Handles JSON objects per-line, JSON arrays, and JSON embedded in markdown code blocks.
+    """
+    logs: List[Dict[str, Any]] = []
+
+    # Strategy 1: Try to parse the entire input as a JSON array
+    try:
+        parsed = json.loads(raw_output.strip())
+        if isinstance(parsed, list):
+            return [item for item in parsed if isinstance(item, dict)]
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    # Strategy 2: Extract JSON from markdown code fences (```json ... ```)
+    code_block_pattern = re.compile(r'```(?:json)?\s*\n(.*?)```', re.DOTALL)
+    for match in code_block_pattern.finditer(raw_output):
+        block = match.group(1).strip()
+        try:
+            parsed = json.loads(block)
+            if isinstance(parsed, list):
+                logs.extend(item for item in parsed if isinstance(item, dict))
+                continue
+            elif isinstance(parsed, dict):
+                logs.append(parsed)
+                continue
+        except (json.JSONDecodeError, ValueError):
+            pass
+        # If the block isn't valid JSON as a whole, try line-by-line
+        for line in block.splitlines():
+            line = line.strip().rstrip(',')
+            if line.startswith("{") and line.endswith("}"):
+                try:
+                    logs.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+
+    if logs:
+        return logs
+
+    # Strategy 3: Fallback — scan every line for individual JSON objects
     for line in raw_output.splitlines():
         line = line.strip()
-        # Look for JSON objects on individual lines
         if line.startswith("{") and line.endswith("}"):
             try:
                 logs.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
+
     return logs
 
 

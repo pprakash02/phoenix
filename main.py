@@ -113,7 +113,7 @@ async def run_phoenix() -> None:
             critic_agent,
         ],
         selection_func=round_robin_router,
-        max_rounds=4,  # exactly 4 rounds for 4 agents
+        max_rounds=10,  # enough headroom for 4 agents plus any retries
     ).build()
 
     mission_briefing = """
