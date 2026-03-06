@@ -144,6 +144,15 @@ async def run_phoenix() -> None:
             author = getattr(msg, "author_name", None) or getattr(msg, "name", "Agent")
             content = getattr(msg, "text", None) or getattr(msg, "content", None)
 
+            # Fallback: extract text from contents list (e.g., tool results)
+            if not content and hasattr(msg, "contents") and msg.contents:
+                parts = []
+                for c in msg.contents:
+                    t = getattr(c, "text", None) or getattr(c, "value", None) or str(c)
+                    if t:
+                        parts.append(str(t))
+                content = "\n".join(parts) if parts else None
+
             if content:
                 print(f"[{author}]")
                 print(content)

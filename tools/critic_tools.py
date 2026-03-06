@@ -1,5 +1,6 @@
 # tools/critic_tools.py
 import os
+import io
 import docker
 from typing import Annotated
 from pydantic import Field
@@ -8,6 +9,24 @@ from agent_framework import tool
 GENERATED_TESTS_DIR = os.path.abspath("generated_tests")
 LEGACY_WORKSPACE = os.path.abspath("legacy_workspace")
 
+TEST_RUNNER_IMAGE = "phoenix-test-runner"
+TEST_RUNNER_DOCKERFILE = b"FROM python:3.10-slim\nRUN pip install --no-cache-dir pytest\n"
+
+
+def _ensure_test_runner_image(docker_client: docker.DockerClient) -> None:
+    """Build the phoenix-test-runner image if it doesn't already exist."""
+    try:
+        docker_client.images.get(TEST_RUNNER_IMAGE)
+    except docker.errors.ImageNotFound:
+        print(f"[SYSTEM] Building {TEST_RUNNER_IMAGE} Docker image (first time only)...")
+        docker_client.images.build(
+            fileobj=io.BytesIO(TEST_RUNNER_DOCKERFILE),
+            tag=TEST_RUNNER_IMAGE,
+            rm=True,
+        )
+        print(f"[SYSTEM] {TEST_RUNNER_IMAGE} image built successfully.")
+
+
 @tool(approval_mode="never_require")
 def verify_test_results(
     test_file_name: Annotated[str, Field(description="The name of the test file saved in 'generated_tests'.")],
@@ -15,7 +34,7 @@ def verify_test_results(
 ) -> str:
     """
     Runs the generated test suite in the Docker sandbox to confirm it passes.
-    Uses Docker directly with network enabled so pytest can be installed.
+    Uses a custom Docker image with pytest pre-installed. Auto-builds the image if missing.
     """
     test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
     legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
@@ -26,6 +45,7 @@ def verify_test_results(
     print(f"\n[SYSTEM] Running test verification for {test_file_name}...\n")
 
     docker_client = docker.from_env()
+    _ensure_test_runner_image(docker_client)
 
     volumes = {
         GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
@@ -36,12 +56,12 @@ def verify_test_results(
 
     try:
         output = docker_client.containers.run(
-            image="phoenix-test-runner",
+            image=TEST_RUNNER_IMAGE,
             command=cmd,
             volumes=volumes,
             environment={'PYTHONPATH': '/legacy'},
             remove=True,
-            network_disabled=True,  # no network needed, pytest is in the image
+            network_disabled=True,
             mem_limit="256m",
             cpu_period=100000,
             cpu_quota=50000
