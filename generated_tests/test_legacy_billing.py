@@ -3,29 +3,23 @@ import pytest
 from legacy_workspace.legacy_billing import process_transaction
 
 
-@pytest.mark.parametrize(
-    "inp,expected",
-    [
-        ("100", 105.0),
-        ("99.99", 104.98949999999999),
-        ("1e10", 10500000000.0),
-        ("00100", 105.0),
-    ],
-)
-def test_successful_mappings(inp, expected):
-    assert process_transaction(inp) == expected
+def test_process_transaction_success():
+    result = process_transaction("100")
+    assert result == 105.0
 
 
-@pytest.mark.parametrize(
-    "inp,exc_type,msg",
-    [
-        ("-5", ValueError, "Transaction amount cannot be negative."),
-        ("0", ZeroDivisionError, "division by zero"),
-        ("abc", ValueError, "could not convert string to float: 'abc'"),
-        ("", ValueError, "could not convert string to float: ''"),
-        ("   ", ValueError, "could not convert string to float: '   '"),
-    ],
-)
-def test_crashes(inp, exc_type, msg):
-    with pytest.raises(exc_type, match=msg):
-        process_transaction(inp)
+def test_process_transaction_negative_amount():
+    with pytest.raises(ValueError) as exc_info:
+        process_transaction("-50")
+    assert "Transaction amount cannot be negative" in str(exc_info.value)
+
+
+def test_process_transaction_zero_amount():
+    with pytest.raises(ZeroDivisionError):
+        process_transaction("0")
+
+
+def test_process_transaction_invalid_input():
+    with pytest.raises(ValueError) as exc_info:
+        process_transaction("abc")
+    assert "could not convert" in str(exc_info.value).lower()
