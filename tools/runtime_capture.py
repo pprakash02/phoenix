@@ -299,7 +299,12 @@ Return ONLY valid JSON. Do not include markdown code blocks or any other explana
         if text.endswith("```"):
             text = text[:-3]
             
-        parsed = _json.loads(text.strip())
+        try:
+            parsed = _json.loads(text.strip())
+        except _json.JSONDecodeError:
+            # The LLM sometimes hallucinates Python literals (True/False/None) instead of JSON (true/false/null)
+            # because the prompt context is heavily Python-flavored. fallback to ast.literal_eval.
+            parsed = _ast.literal_eval(text.strip())
         
         # Extract the list of inputs from various response shapes
         raw_inputs = None

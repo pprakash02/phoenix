@@ -1,271 +1,790 @@
 [
   {
-    "function": "find_square",
+    "function": "load_words",
+    "inputs": {
+      "args": [],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "[list of 55900 items]",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
     "inputs": {
       "args": [
         0
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 0,
-    "error": null,
-    "module": "balle"
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: object of type 'int' has no len()",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 40, in choose_word\n    return random.choice(wordlist)\n  File \"/usr/local/lib/python3.10/random.py\", line 378, in choice\n    return seq[self._randbelow(len(seq))]\nTypeError: object of type 'int' has no len()\n",
+    "module": "hangman"
   },
   {
-    "function": "find_square",
+    "function": "choose_word",
     "inputs": {
       "args": [
-        5
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 25,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        -5
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 25,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        12345678901234567890
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 152415787532388367501905199875019052100,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        3.14159
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 9.869587728099999,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        -1e-06
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 1e-12,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        1e+308
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": Infinity,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "find_square",
-    "inputs": {
-      "args": [
-        true
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 1,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "add_numbers",
-    "inputs": {
-      "args": [
-        0,
-        0
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 0,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "add_numbers",
-    "inputs": {
-      "args": [
-        1,
         1
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 2,
-    "error": null,
-    "module": "balle"
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: object of type 'int' has no len()",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 40, in choose_word\n    return random.choice(wordlist)\n  File \"/usr/local/lib/python3.10/random.py\", line 378, in choice\n    return seq[self._randbelow(len(seq))]\nTypeError: object of type 'int' has no len()\n",
+    "module": "hangman"
   },
   {
-    "function": "add_numbers",
+    "function": "choose_word",
     "inputs": {
       "args": [
-        -1,
         -1
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": -2,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        "Alice"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
+    "status": "crashed",
     "output": null,
-    "error": null,
-    "module": "balle"
+    "error": "TypeError: object of type 'int' has no len()",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 40, in choose_word\n    return random.choice(wordlist)\n  File \"/usr/local/lib/python3.10/random.py\", line 378, in choice\n    return seq[self._randbelow(len(seq))]\nTypeError: object of type 'int' has no len()\n",
+    "module": "hangman"
   },
   {
-    "function": "greet_with_default",
+    "function": "has_player_won",
     "inputs": {
       "args": [
-        ""
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        "          "
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        "\\n\\t"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        "\ud83d\ude00\ud83d\ude80"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        null
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        12345
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
-        {
-          "first": "John",
-          "last": "Doe"
-        }
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "balle"
-  },
-  {
-    "function": "greet_with_default",
-    "inputs": {
-      "args": [
+        "apple",
         [
-          "Bob",
-          "Smith"
+          "a",
+          "p",
+          "l",
+          "e"
         ]
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": null,
+    "output": true,
     "error": null,
-    "module": "balle"
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "banana",
+        [
+          "b",
+          "a",
+          "n"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "test",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "abc",
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "xyz",
+        [
+          "x",
+          "y"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "mississippi",
+        [
+          "m",
+          "i",
+          "s",
+          "p"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "hello",
+        [
+          "h",
+          "e",
+          "l",
+          "l",
+          "o"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "world",
+        [
+          "W",
+          "o",
+          "r",
+          "l",
+          "d"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "data",
+        [
+          "1",
+          "2",
+          "a",
+          "t",
+          "d"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "apple",
+        [
+          "a",
+          "e",
+          "i",
+          "o",
+          "u"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "a___e",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "banana",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "______",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "mississippi",
+        [
+          "z",
+          "x",
+          "q"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "___________",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "hangman",
+        [
+          "h",
+          "a",
+          "n",
+          "g",
+          "m"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "hangman",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "test",
+        [
+          "t",
+          "t",
+          "e",
+          "s",
+          "t"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "test",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "python",
+        [
+          "P",
+          "Y",
+          "T",
+          "H",
+          "O",
+          "N"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "______",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "abcdefghijklmnopqrstuvwxyz",
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "i",
+          "j",
+          "k",
+          "l",
+          "m",
+          "n",
+          "o",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "code",
+        [
+          "c",
+          "0",
+          "!"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "c___",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "defghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "i",
+          "j",
+          "k",
+          "l",
+          "m",
+          "n",
+          "o",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "a",
+          "b"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "cdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "z",
+          "x",
+          "m"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklnopqrstuvwy",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "A",
+          "b"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "acdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "1",
+          "!",
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "bcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c",
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "i",
+          "j",
+          "k",
+          "l",
+          "m",
+          "n",
+          "o",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z",
+          "z"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          ""
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "apple",
+        "abcdefghijklmnopqrstuvwxyz"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "banana",
+        "aeiou"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "xyz",
+        "abc"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "",
+        "abc"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "HELLO",
+        "hello"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "mississippi",
+        "msp"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "p",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "test",
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "a",
+        "a"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "ab",
+        "ba"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "b",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 113, in unique_letters\n    for char in secret_word:\nTypeError: 'int' object is not iterable\n",
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 113, in unique_letters\n    for char in secret_word:\nTypeError: 'int' object is not iterable\n",
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 113, in unique_letters\n    for char in secret_word:\nTypeError: 'int' object is not iterable\n",
+    "module": "hangman"
   }
 ]
