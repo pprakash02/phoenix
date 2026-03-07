@@ -32,17 +32,28 @@ Example:
     module_name = os.path.basename(abs_path).replace(".py", "")
     harness_path = os.path.join(dir_name, "phoenix_harness.py")
 
-    # Build function specs as JSON
+    # Build function specs as JSON, then base64-encode to avoid
+    # string-escaping issues when embedding inside Python triple-quotes.
+    import base64
     functions_json = json.dumps(functions)
+    functions_b64 = base64.b64encode(functions_json.encode()).decode()
 
     harness_code = f"""
 import sys
 import json
 import traceback
+import base64
 
 sys.path.append('/workspace')
 
-import {module_name}
+# Decode function specs from base64 (avoids quoting/escaping issues)
+functions = json.loads(base64.b64decode('{functions_b64}').decode())
+
+try:
+    import {module_name}
+except Exception as e:
+    print(json.dumps({{"error": f"Failed to import {module_name}: {{type(e).__name__}}: {{str(e)}}"}}))
+    sys.exit(1)
 
 def runtime_logger(func_name, func):
     def wrapper(*args, **kwargs):
@@ -64,9 +75,6 @@ def runtime_logger(func_name, func):
         finally:
             print(json.dumps(capture_data, default=str))
     return wrapper
-
-# Load function specs
-functions = json.loads('''{functions_json}''')
 
 for func_spec in functions:
     func_name = func_spec["name"]
@@ -134,6 +142,12 @@ for func_spec in functions:
                         crashes += 1
                 except json.JSONDecodeError:
                     pass
+
+        # Diagnostic: log sandbox output if no records were captured
+        if not new_records:
+            print(f"[SYSTEM] WARNING: 0 records captured. Sandbox output preview:")
+            preview = logs[:500] if len(logs) > 500 else logs
+            print(preview)
 
         # Load existing captures and append
         existing = []

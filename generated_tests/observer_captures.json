@@ -1,1 +1,271 @@
-[]
+[
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 0,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        5
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 25,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        -5
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 25,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        12345678901234567890
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 152415787532388367501905199875019052100,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        3.14159
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 9.869587728099999,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        -1e-06
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 1e-12,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        1e+308
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": Infinity,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "find_square",
+    "inputs": {
+      "args": [
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 1,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "add_numbers",
+    "inputs": {
+      "args": [
+        0,
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 0,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "add_numbers",
+    "inputs": {
+      "args": [
+        1,
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 2,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "add_numbers",
+    "inputs": {
+      "args": [
+        -1,
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": -2,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        "Alice"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        "          "
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        "\\n\\t"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        "\ud83d\ude00\ud83d\ude80"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        null
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        12345
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        {
+          "first": "John",
+          "last": "Doe"
+        }
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  },
+  {
+    "function": "greet_with_default",
+    "inputs": {
+      "args": [
+        [
+          "Bob",
+          "Smith"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "balle"
+  }
+]
