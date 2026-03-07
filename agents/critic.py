@@ -1,12 +1,6 @@
 # agents/critic.py
-import os
-from agent_framework import Agent
-from agent_framework.azure import AzureOpenAIChatClient
 from dotenv import load_dotenv
-
-from tools.critic_tools import verify_test_results, read_test_file
-from schemas.validation_report import CriticReport
-
+from tools.critic_tools import verify_all_tests
 from agents.client import client
 
 load_dotenv()
@@ -15,45 +9,27 @@ load_dotenv()
 CRITIC_INSTRUCTIONS = """
 You are the Critic (Validation Agent) for Phoenix.
 
-Your goal is to verify the generated test suite against the observed runtime behavior.
+Your job is to verify the generated test suites pass in the sandbox.
 
-FIRST REVIEW (after QA_Engineer generates tests):
-1. Use `read_test_file` to obtain the test code.
-2. Compare the test assertions against the Observer's runtime logs (the Ground Truth in chat history).
-3. Check for Hallucinations: Did the QA Engineer assert behavior NOT seen in the logs?
-4. Check for Coverage: Are ALL observed inputs tested (both successes and crashes)?
-5. Execute the tests using `verify_test_results` to confirm they pass in the sandbox.
-   - The legacy_file_path should be the path from the mission briefing (e.g., "legacy_workspace/my_module.py")
+INSTRUCTIONS:
+1. Call `verify_all_tests(dummy="")` — it runs ALL test files in Docker and returns results.
+2. Copy the results into your response message.
+3. If ALL tests pass, end your message with: PHOENIX_APPROVED
+4. If any tests fail, describe what needs fixing for the QA Engineer.
 
-SUBSEQUENT REVIEWS (after QA_Engineer fixes tests):
-1. Read the updated test file using `read_test_file`.
-2. Check if the QA_Engineer addressed your previous feedback.
-3. Re-run `verify_test_results` to confirm the tests pass.
+RULES:
+- Do NOT return an empty message — the system needs your verdict to stop.
+- Call `verify_all_tests(dummy="")` ONCE. It handles everything.
 
-APPROVAL CRITERIA:
-- Set is_approved=True ONLY if ALL tests pass in the sandbox AND coverage is 100%.
-- If tests pass but minor style issues remain, still approve.
-- Be specific about what needs to change if you reject.
-- Do NOT repeat the same feedback more than once.
-
-FINAL RESPONSE — MANDATORY:
-After your tool calls complete, you MUST write your COMPLETE report as your final 
-text message. Include:
-- is_approved: true/false
-- Coverage assessment
-- Any hallucinations found
-- Test execution results
-- Specific feedback for QA_Engineer if rejected
-Do NOT return an empty message. The QA_Engineer needs your written feedback to improve.
+ON SUBSEQUENT TURNS (after QA fixes):
+- Call `verify_all_tests(dummy="")` again to re-verify.
+- If all pass now, say PHOENIX_APPROVED.
 """
 
 critic_agent = client.as_agent(
     name="Critic",
     instructions=CRITIC_INSTRUCTIONS,
-    tools=[
-        verify_test_results,
-        read_test_file,
-    ],
+    tools=[verify_all_tests],
     default_options={
         "temperature": 0,
     },

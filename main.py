@@ -5,7 +5,6 @@ import os
 
 # Import Phoenix agents
 from agents.observer import observer_agent
-from agents.analyst import analyst_agent
 from agents.qa_engineer import qa_engineer_agent
 from agents.critic import critic_agent
 
@@ -103,6 +102,13 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
 
     all_sections = "\n".join(file_sections)
 
+    # Build module list for QA Engineer
+    modules = []
+    for fpath in legacy_files:
+        mod_name = os.path.basename(fpath).replace(".py", "")
+        modules.append(f"      generate_tests(module_name=\"{mod_name}\", legacy_file_path=\"{fpath}\")")
+    module_calls = "\n".join(modules)
+
     return f"""
     Team Phoenix,
 
@@ -112,19 +118,20 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
 
     Workflow:
     1. Observer:
-       - The source code is ALREADY provided above. Do NOT call cat or read any files.
-       - For each function marked [TESTABLE], call `capture_function_runtime` with 5-10
-         diverse test inputs based on the source code logic.
-       - For MULTI-argument functions: pass test_inputs as a list of argument LISTS, e.g.
-         [["arg1", "arg2"], ["arg1b", "arg2b"]]
-       - For SINGLE-argument functions: pass a flat list, e.g. ["val1", "val2"]
-       - Your final message MUST include all raw JSON runtime data.
+       - Call `observe_file` ONCE for each .py file listed above.
+       - Just pass the file path, e.g.: observe_file("legacy_workspace/hangman.py")
+       - The tool handles test input generation and runtime capture automatically.
+       - Write a summary of what was captured.
 
-    2. Analyst: Parse the Observer's runtime logs into a behavioral specification.
+    2. QA Engineer:
+       - Call `generate_tests` ONCE for each module:
+{module_calls}
+       - Write a summary listing what test files were generated.
 
-    3. QA Engineer: Convert the specification into PyTest suites. Save one test file per module.
-
-    4. Critic: Verify the suites in the sandbox, ensure 100% coverage, and approve/reject.
+    3. Critic:
+       - Call `verify_all_tests(dummy="")` to run ALL test suites in the sandbox.
+       - If all pass, end your message with: PHOENIX_APPROVED
+       - If any fail, describe what needs fixing.
     """
 
 
@@ -132,13 +139,13 @@ def round_robin_router(state: GroupChatState):
     """
     Controls which agent speaks next.
 
-    Initial pipeline (rounds 0-3):
-        Observer → Analyst → QA_Engineer → Critic
+    Initial pipeline (rounds 0-2):
+        Observer → QA_Engineer → Critic
 
-    Iterative fix loop (rounds 4+):
+    Iterative fix loop (rounds 3+):
         QA_Engineer → Critic → QA_Engineer → Critic → ...
     """
-    order = ["Observer", "Analyst", "QA_Engineer", "Critic"]
+    order = ["Observer", "QA_Engineer", "Critic"]
 
     if state.current_round < len(order):
         return order[state.current_round]
@@ -166,15 +173,39 @@ async def run_phoenix() -> None:
         print(f"         → {f}  ({len(testable)} testable, {len(skipped)} skipped)")
     print()
 
+    # Clear old observer captures from previous runs
+    captures_file = os.path.join(os.path.abspath("generated_tests"), "observer_captures.json")
+    if os.path.exists(captures_file):
+        os.remove(captures_file)
+
     # Build the group chat workflow
+    def should_terminate(messages: list) -> bool:
+        """Stop the conversation when the Critic approves."""
+        if not messages:
+            return False
+        
+        # Look backwards through messages to find the most recent agent message
+        for msg in reversed(messages):
+            author = getattr(msg, "author_name", None) or getattr(msg, "name", "")
+            # Skip the initial system mission briefing
+            if not author or author == "System":
+                continue
+                
+            text = getattr(msg, "text", None) or getattr(msg, "content", None) or ""
+            if "PHOENIX_APPROVED" in text:
+                return True
+            return False # Only care about the very last actual agent message
+            
+        return False
+
     workflow = GroupChatBuilder(
         participants=[
             observer_agent,
-            analyst_agent,
             qa_engineer_agent,
             critic_agent,
         ],
         selection_func=round_robin_router,
+        termination_condition=should_terminate,
         max_rounds=12,
     ).build()
 

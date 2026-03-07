@@ -1,6 +1,8 @@
 # tools/critic_tools.py
 import os
 import io
+import json
+import glob
 import docker
 from typing import Annotated
 from pydantic import Field
@@ -27,66 +29,133 @@ def _ensure_test_runner_image(docker_client: docker.DockerClient) -> None:
         print(f"[SYSTEM] {TEST_RUNNER_IMAGE} image built successfully.")
 
 
+def _run_test_in_sandbox(docker_client, test_file_name: str) -> dict:
+    """Run a single test file in Docker and return results."""
+    test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
+    project_root = os.path.abspath(".")
+
+    if not os.path.isfile(test_path):
+        return {"file": test_file_name, "status": "ERROR", "detail": "File not found"}
+
+    print(f"\n[SYSTEM] Running test verification for {test_file_name}...\n")
+
+    volumes = {
+        GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
+        project_root: {'bind': '/project', 'mode': 'ro'},
+    }
+
+    cmd = f"pytest /workspace/{test_file_name} -v -p no:cacheprovider"
+
+    try:
+        container = docker_client.containers.create(
+            image=TEST_RUNNER_IMAGE,
+            command=cmd,
+            volumes=volumes,
+            environment={'PYTHONPATH': '/project'},
+            working_dir="/project/legacy_workspace",
+            mem_limit="256m",
+            cpu_period=100000,
+            cpu_quota=50000,
+            network_disabled=True,
+        )
+        container.start()
+        container.wait(timeout=60)
+        logs = container.logs(stdout=True, stderr=True).decode("utf-8", errors="replace")
+        container.remove()
+
+        # Parse results
+        passed = logs.count(" PASSED")
+        failed = logs.count(" FAILED")
+        errors = logs.count(" ERROR")
+
+        if failed == 0 and errors == 0:
+            return {"file": test_file_name, "status": "PASSED", "passed": passed, "failed": 0, "detail": logs[-300:] if len(logs) > 300 else logs}
+        else:
+            return {"file": test_file_name, "status": "FAILED", "passed": passed, "failed": failed + errors, "detail": logs[-500:] if len(logs) > 500 else logs}
+    except Exception as e:
+        return {"file": test_file_name, "status": "ERROR", "detail": str(e)[:200]}
+
+
+@tool(approval_mode="never_require")
+def verify_all_tests(
+    dummy: Annotated[str, Field(description="Dummy argument. Pass an empty string.")] = ""
+) -> str:
+    """
+    Verify ALL generated test suites in the sandbox at once.
+    Scans generated_tests/test_*.py, runs each in Docker,
+    and returns a concise pass/fail summary.
+    Call this ONCE — it handles everything.
+    """
+    test_files = sorted(glob.glob(os.path.join(GENERATED_TESTS_DIR, "test_*.py")))
+
+    if not test_files:
+        return "ERROR: No test files found in generated_tests/."
+
+    docker_client = docker.from_env()
+    _ensure_test_runner_image(docker_client)
+
+    results = []
+    total_passed = 0
+    total_failed = 0
+
+    for tf in test_files:
+        fname = os.path.basename(tf)
+        r = _run_test_in_sandbox(docker_client, fname)
+        results.append(r)
+        total_passed += r.get("passed", 0)
+        total_failed += r.get("failed", 0)
+
+    # Build summary
+    lines = [f"VERIFICATION RESULTS ({len(results)} test files)\n"]
+    all_pass = True
+
+    for r in results:
+        status = r["status"]
+        if status == "PASSED":
+            lines.append(f"  ✅ {r['file']}: {r.get('passed', 0)} tests passed")
+        else:
+            all_pass = False
+            lines.append(f"  ❌ {r['file']}: {status} — {r.get('passed', 0)} passed, {r.get('failed', 0)} failed")
+            lines.append(f"     Detail: {r['detail'][:200]}")
+
+    lines.append(f"\nTOTAL: {total_passed} passed, {total_failed} failed")
+
+    if all_pass:
+        lines.append("\nAll test suites PASSED. Full coverage confirmed.")
+    else:
+        lines.append("\nSome tests FAILED. QA Engineer should fix the failing tests.")
+
+    return "\n".join(lines)
+
+
 @tool(approval_mode="never_require")
 def verify_test_results(
     test_file_name: Annotated[str, Field(description="The name of the test file saved in 'generated_tests'.")],
     legacy_file_path: Annotated[str, Field(description="Path to the original legacy code.")]
 ) -> str:
     """
-    Runs the generated test suite in the Docker sandbox to confirm it passes.
-    Uses a custom Docker image with pytest pre-installed. Auto-builds the image if missing.
+    Runs a single test suite in the Docker sandbox.
+    For bulk verification, use verify_all_tests instead.
     """
-    test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
-    legacy_dir = os.path.dirname(os.path.abspath(legacy_file_path))
-
-    if not os.path.isfile(test_path):
-        return f"ERROR: Test file not found: {test_path}"
-
-    print(f"\n[SYSTEM] Running test verification for {test_file_name}...\n")
-
     docker_client = docker.from_env()
     _ensure_test_runner_image(docker_client)
-
-    volumes = {
-        GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
-        legacy_dir: {'bind': '/legacy', 'mode': 'ro'},
-    }
-
-    cmd = f"pytest /workspace/{test_file_name} -v"
-
-    try:
-        output = docker_client.containers.run(
-            image=TEST_RUNNER_IMAGE,
-            command=cmd,
-            volumes=volumes,
-            environment={'PYTHONPATH': '/legacy'},
-            remove=True,
-            network_disabled=True,
-            working_dir="/legacy",
-            mem_limit="256m",
-            cpu_period=100000,
-            cpu_quota=50000
-        )
-        return output.decode("utf-8", errors="replace")
-    except docker.errors.ContainerError as e:
-        return f"Execution Failed with Exit Code {e.exit_status}.\n{e.stderr.decode('utf-8', errors='replace') if e.stderr else str(e)}"
-    except Exception as e:
-        return f"Docker Error: {str(e)}"
+    r = _run_test_in_sandbox(docker_client, test_file_name)
+    if r["status"] == "PASSED":
+        return f"✅ {test_file_name}: {r.get('passed', 0)} tests passed\n{r['detail']}"
+    else:
+        return f"❌ {test_file_name}: {r['status']}\n{r['detail']}"
 
 
 @tool(approval_mode="never_require")
 def read_test_file(
     test_file_name: Annotated[str, Field(description="The name of the test file in 'generated_tests'.")]
 ) -> str:
-    """
-    Reads the content of a generated test file.
-    """
+    """Reads the content of a generated test file."""
     test_path = os.path.abspath(os.path.join("generated_tests", test_file_name))
     try:
         with open(test_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        return content
+            return f.read()
     except FileNotFoundError:
-        return f"ERROR: Test file {test_file_name} not found in generated_tests directory."
+        return f"ERROR: Test file {test_file_name} not found."
     except Exception as e:
-        return f"ERROR: Failed to read test file: {str(e)}"
+        return f"ERROR: {str(e)}"
