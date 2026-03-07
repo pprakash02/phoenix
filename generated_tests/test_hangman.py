@@ -4,269 +4,59 @@
 
 import pytest
 import math
-from legacy_workspace.hangman import load_words, choose_word, has_player_won, get_word_progress, get_available_letters, revealed, unique_letters
+from legacy_workspace.hangman import process_transaction
 
 
-def test_load_words_success_0():
-    """Test load_words returns without error."""
-    result = load_words()
-    assert result is not None
+def test_process_transaction_success_0():
+    """Test process_transaction(150) == 157.5"""
+    result = process_transaction(150)
+    assert result == pytest.approx(157.5)
 
 
-def test_choose_word_crash_0():
-    """Test choose_word(0) raises TypeError."""
-    with pytest.raises(TypeError):
-        choose_word(0)
+def test_process_transaction_success_1():
+    """Test process_transaction('250.75') == 263.2875"""
+    result = process_transaction('250.75')
+    assert result == pytest.approx(263.2875)
 
 
-def test_choose_word_crash_1():
-    """Test choose_word(1) raises TypeError."""
-    with pytest.raises(TypeError):
-        choose_word(1)
+def test_process_transaction_success_2():
+    """Test process_transaction('1e6') == 1050000.0"""
+    result = process_transaction('1e6')
+    assert result == pytest.approx(1050000.0)
 
 
-def test_choose_word_crash_2():
-    """Test choose_word(-1) raises TypeError."""
-    with pytest.raises(TypeError):
-        choose_word(-1)
+def test_process_transaction_success_3():
+    """Test process_transaction('   3.5   ') == 3.6750000000000003"""
+    result = process_transaction('   3.5   ')
+    assert result == pytest.approx(3.6750000000000003)
 
 
-def test_has_player_won_success_0():
-    """Test has_player_won('apple', ['a', 'p', 'l', 'e']) == True"""
-    result = has_player_won('apple', ['a', 'p', 'l', 'e'])
-    assert result is True
+def test_process_transaction_success_4():
+    """Test process_transaction('nan') == float('nan')"""
+    result = process_transaction('nan')
+    assert result == pytest.approx(float('nan'), nan_ok=True)
 
 
-def test_has_player_won_success_1():
-    """Test has_player_won('banana', ['b', 'a', 'n']) == True"""
-    result = has_player_won('banana', ['b', 'a', 'n'])
-    assert result is True
+def test_process_transaction_success_5():
+    """Test process_transaction('inf') == float('inf')"""
+    result = process_transaction('inf')
+    assert result == pytest.approx(float('inf'))
 
 
-def test_has_player_won_success_2():
-    """Test has_player_won('test', []) == False"""
-    result = has_player_won('test', [])
-    assert result is False
+def test_process_transaction_success_6():
+    """Test process_transaction(True) == 1.05"""
+    result = process_transaction(True)
+    assert result == pytest.approx(1.05)
 
 
-def test_has_player_won_success_3():
-    """Test has_player_won('', []) == True"""
-    result = has_player_won('', [])
-    assert result is True
-
-
-def test_has_player_won_success_4():
-    """Test has_player_won('abc', ['a', 'b', 'c', 'd', 'e']) == True"""
-    result = has_player_won('abc', ['a', 'b', 'c', 'd', 'e'])
-    assert result is True
-
-
-def test_has_player_won_success_5():
-    """Test has_player_won('xyz', ['x', 'y']) == False"""
-    result = has_player_won('xyz', ['x', 'y'])
-    assert result is False
-
-
-def test_has_player_won_success_6():
-    """Test has_player_won('mississippi', ['m', 'i', 's', 'p']) == True"""
-    result = has_player_won('mississippi', ['m', 'i', 's', 'p'])
-    assert result is True
-
-
-def test_has_player_won_success_7():
-    """Test has_player_won('hello', ['h', 'e', 'l', 'l', 'o']) == True"""
-    result = has_player_won('hello', ['h', 'e', 'l', 'l', 'o'])
-    assert result is True
-
-
-def test_has_player_won_success_8():
-    """Test has_player_won('world', ['W', 'o', 'r', 'l', 'd']) == False"""
-    result = has_player_won('world', ['W', 'o', 'r', 'l', 'd'])
-    assert result is False
-
-
-def test_has_player_won_success_9():
-    """Test has_player_won('data', ['1', '2', 'a', 't', 'd']) == True"""
-    result = has_player_won('data', ['1', '2', 'a', 't', 'd'])
-    assert result is True
-
-
-def test_get_word_progress_success_0():
-    """Test get_word_progress('apple', ['a', 'e', 'i', 'o', 'u']) == 'a___e'"""
-    result = get_word_progress('apple', ['a', 'e', 'i', 'o', 'u'])
-    assert result == 'a___e'
-
-
-def test_get_word_progress_success_1():
-    """Test get_word_progress('', []) == ''"""
-    result = get_word_progress('', [])
-    assert result == ''
-
-
-def test_get_word_progress_success_2():
-    """Test get_word_progress('banana', []) == '______'"""
-    result = get_word_progress('banana', [])
-    assert result == '______'
-
-
-def test_get_word_progress_success_3():
-    """Test get_word_progress('mississippi', ['z', 'x', 'q']) == '___________'"""
-    result = get_word_progress('mississippi', ['z', 'x', 'q'])
-    assert result == '___________'
-
-
-def test_get_word_progress_success_4():
-    """Test get_word_progress('hangman', ['h', 'a', 'n', 'g', 'm']) == 'hangman'"""
-    result = get_word_progress('hangman', ['h', 'a', 'n', 'g', 'm'])
-    assert result == 'hangman'
-
-
-def test_get_word_progress_success_5():
-    """Test get_word_progress('test', ['t', 't', 'e', 's', 't']) == 'test'"""
-    result = get_word_progress('test', ['t', 't', 'e', 's', 't'])
-    assert result == 'test'
-
-
-def test_get_word_progress_success_6():
-    """Test get_word_progress('python', ['P', 'Y', 'T', 'H', 'O', 'N']) == '______'"""
-    result = get_word_progress('python', ['P', 'Y', 'T', 'H', 'O', 'N'])
-    assert result == '______'
-
-
-def test_get_word_progress_success_7():
-    """Test get_word_progress('abcdefghijklmnopqrstuvwxyz', ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']) == 'abcdefghijklmnopqrstuvwxyz'"""
-    result = get_word_progress('abcdefghijklmnopqrstuvwxyz', ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
-    assert result == 'abcdefghijklmnopqrstuvwxyz'
-
-
-def test_get_word_progress_success_8():
-    """Test get_word_progress('code', ['c', '0', '!']) == 'c___'"""
-    result = get_word_progress('code', ['c', '0', '!'])
-    assert result == 'c___'
-
-
-def test_get_available_letters_success_0():
-    """Test get_available_letters([]) == 'abcdefghijklmnopqrstuvwxyz'"""
-    result = get_available_letters([])
-    assert result == 'abcdefghijklmnopqrstuvwxyz'
-
-
-def test_get_available_letters_success_1():
-    """Test get_available_letters(['a', 'b', 'c']) == 'defghijklmnopqrstuvwxyz'"""
-    result = get_available_letters(['a', 'b', 'c'])
-    assert result == 'defghijklmnopqrstuvwxyz'
-
-
-def test_get_available_letters_success_2():
-    """Test get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']) == ''"""
-    result = get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
-    assert result == ''
-
-
-def test_get_available_letters_success_3():
-    """Test get_available_letters(['a', 'a', 'b']) == 'cdefghijklmnopqrstuvwxyz'"""
-    result = get_available_letters(['a', 'a', 'b'])
-    assert result == 'cdefghijklmnopqrstuvwxyz'
-
-
-def test_get_available_letters_success_4():
-    """Test get_available_letters(['z', 'x', 'm']) == 'abcdefghijklnopqrstuvwy'"""
-    result = get_available_letters(['z', 'x', 'm'])
-    assert result == 'abcdefghijklnopqrstuvwy'
-
-
-def test_get_available_letters_success_5():
-    """Test get_available_letters(['A', 'b']) == 'acdefghijklmnopqrstuvwxyz'"""
-    result = get_available_letters(['A', 'b'])
-    assert result == 'acdefghijklmnopqrstuvwxyz'
-
-
-def test_get_available_letters_success_6():
-    """Test get_available_letters(['1', '!', 'a']) == 'bcdefghijklmnopqrstuvwxyz'"""
-    result = get_available_letters(['1', '!', 'a'])
-    assert result == 'bcdefghijklmnopqrstuvwxyz'
-
-
-def test_get_available_letters_success_7():
-    """Test get_available_letters(['a', 'b', 'c', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'z']) == ''"""
-    result = get_available_letters(['a', 'b', 'c', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'z'])
-    assert result == ''
-
-
-def test_get_available_letters_success_8():
-    """Test get_available_letters(['']) == 'abcdefghijklmnopqrstuvwxyz'"""
-    result = get_available_letters([''])
-    assert result == 'abcdefghijklmnopqrstuvwxyz'
-
-
-def test_revealed_success_0():
-    """Test revealed returns an element from its input."""
-    result = revealed('apple', 'abcdefghijklmnopqrstuvwxyz')
-    assert result in 'apple'
-
-
-def test_revealed_success_1():
-    """Test revealed returns an element from its input."""
-    result = revealed('banana', 'aeiou')
-    assert result in 'banana'
-
-
-def test_revealed_success_2():
-    """Test revealed returns an element from its input."""
-    result = revealed('mississippi', 'msp')
-    assert result in 'mississippi'
-
-
-def test_revealed_success_3():
-    """Test revealed returns an element from its input."""
-    result = revealed('a', 'a')
-    assert result in 'a'
-
-
-def test_revealed_success_4():
-    """Test revealed returns an element from its input."""
-    result = revealed('ab', 'ba')
-    assert result in 'ab'
-
-
-def test_revealed_crash_0():
-    """Test revealed('xyz', 'abc') raises ValueError."""
+def test_process_transaction_crash_0():
+    """Test process_transaction('-5') raises ValueError."""
     with pytest.raises(ValueError):
-        revealed('xyz', 'abc')
+        process_transaction('-5')
 
 
-def test_revealed_crash_1():
-    """Test revealed('', 'abc') raises ValueError."""
-    with pytest.raises(ValueError):
-        revealed('', 'abc')
-
-
-def test_revealed_crash_2():
-    """Test revealed('HELLO', 'hello') raises ValueError."""
-    with pytest.raises(ValueError):
-        revealed('HELLO', 'hello')
-
-
-def test_revealed_crash_3():
-    """Test revealed('test', '') raises ValueError."""
-    with pytest.raises(ValueError):
-        revealed('test', '')
-
-
-def test_unique_letters_crash_0():
-    """Test unique_letters(0) raises TypeError."""
-    with pytest.raises(TypeError):
-        unique_letters(0)
-
-
-def test_unique_letters_crash_1():
-    """Test unique_letters(1) raises TypeError."""
-    with pytest.raises(TypeError):
-        unique_letters(1)
-
-
-def test_unique_letters_crash_2():
-    """Test unique_letters(-1) raises TypeError."""
-    with pytest.raises(TypeError):
-        unique_letters(-1)
+def test_process_transaction_crash_1():
+    """Test process_transaction('0') raises ZeroDivisionError."""
+    with pytest.raises(ZeroDivisionError):
+        process_transaction('0')
 

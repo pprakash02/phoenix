@@ -267,62 +267,69 @@ For a function with 2 arguments like `def bar(a, b)`, return:
 Return ONLY valid JSON. Do not include markdown code blocks or any other explanation.
 """
     
-    try:
+    max_retries = 3
+    last_error = None
+    
+    for attempt in range(max_retries):
         try:
-            loop = _asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-        
-        if loop and loop.is_running():
-            import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(1) as pool:
-                def run_sync():
-                    return _asyncio.run(client.get_response(
-                        messages=[_Message("user", [prompt])],
-                        default_options={"temperature": 0.2, "response_format": {"type": "json_object"}}
-                    ))
-                response = pool.submit(run_sync).result()
-        else:
-            response = _asyncio.run(client.get_response(
-                messages=[_Message("user", [prompt])],
-                default_options={"temperature": 0.2, "response_format": {"type": "json_object"}}
-            ))
-
-        text = response.messages[-1].text
-        
-        # Strip potential markdown formatting if the model disobeys
-        text = text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.startswith("```"):
-            text = text[3:]
-        if text.endswith("```"):
-            text = text[:-3]
+            try:
+                loop = _asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
             
-        try:
-            parsed = _json.loads(text.strip())
-        except _json.JSONDecodeError:
-            # The LLM sometimes hallucinates Python literals (True/False/None) instead of JSON (true/false/null)
-            # because the prompt context is heavily Python-flavored. fallback to ast.literal_eval.
-            parsed = _ast.literal_eval(text.strip())
-        
-        # Extract the list of inputs from various response shapes
-        raw_inputs = None
-        if isinstance(parsed, dict):
-            # Look for "test_inputs" key first, then any list value
-            raw_inputs = parsed.get("test_inputs")
-            if raw_inputs is None:
-                for val in parsed.values():
-                    if isinstance(val, list):
-                        raw_inputs = val
-                        break
-        elif isinstance(parsed, list):
-            raw_inputs = parsed
-        
-        if raw_inputs:
-            return _normalize_inputs(raw_inputs, num_args)
-    except Exception as e:
-        print(f"Warning: Failed to generate LLM fuzzing inputs for {func_node.name}: {e}")
+            if loop and loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor(1) as pool:
+                    def run_sync():
+                        return _asyncio.run(client.get_response(
+                            messages=[_Message("user", [prompt])],
+                            default_options={"temperature": 0.2 + (attempt * 0.2), "response_format": {"type": "json_object"}}
+                        ))
+                    response = pool.submit(run_sync).result()
+            else:
+                response = _asyncio.run(client.get_response(
+                    messages=[_Message("user", [prompt])],
+                    default_options={"temperature": 0.2 + (attempt * 0.2), "response_format": {"type": "json_object"}}
+                ))
+
+            text = response.messages[-1].text
+            
+            # Strip potential markdown formatting if the model disobeys
+            text = text.strip()
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.startswith("```"):
+                text = text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+                
+            try:
+                parsed = _json.loads(text.strip())
+            except _json.JSONDecodeError:
+                # The LLM sometimes hallucinates Python literals (True/False/None) instead of JSON (true/false/null)
+                # because the prompt context is heavily Python-flavored. fallback to ast.literal_eval.
+                parsed = _ast.literal_eval(text.strip())
+            
+            # Extract the list of inputs from various response shapes
+            raw_inputs = None
+            if isinstance(parsed, dict):
+                # Look for "test_inputs" key first, then any list value
+                raw_inputs = parsed.get("test_inputs")
+                if raw_inputs is None:
+                    for val in parsed.values():
+                        if isinstance(val, list):
+                            raw_inputs = val
+                            break
+            elif isinstance(parsed, list):
+                raw_inputs = parsed
+            
+            if raw_inputs:
+                return _normalize_inputs(raw_inputs, num_args)
+        except Exception as e:
+            last_error = e
+            continue
+            
+    print(f"Warning: Failed to generate LLM fuzzing inputs for {func_node.name} after {max_retries} attempts: {last_error}")
         
     # Fallback: generate simple default inputs based on arg count
     print(f"[SYSTEM] Using fallback inputs for {func_node.name}")
