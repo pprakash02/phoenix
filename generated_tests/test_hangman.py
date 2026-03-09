@@ -4,59 +4,335 @@
 
 import pytest
 import math
-from legacy_workspace.hangman import process_transaction
+from legacy_workspace.hangman import load_words, choose_word, has_player_won, get_word_progress, get_available_letters, revealed, unique_letters
 
 
-def test_process_transaction_success_0():
-    """Test process_transaction(150) == 157.5"""
-    result = process_transaction(150)
-    assert result == pytest.approx(157.5)
+def test_load_words_success_0():
+    """Test load_words returns without error."""
+    result = load_words()
+    assert result is not None
 
 
-def test_process_transaction_success_1():
-    """Test process_transaction('250.75') == 263.2875"""
-    result = process_transaction('250.75')
-    assert result == pytest.approx(263.2875)
+def test_choose_word_success_0():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['apple'])
+    assert result in ['apple']
 
 
-def test_process_transaction_success_2():
-    """Test process_transaction('1e6') == 1050000.0"""
-    result = process_transaction('1e6')
-    assert result == pytest.approx(1050000.0)
+def test_choose_word_success_1():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['cat', 'dog', 'mouse'])
+    assert result in ['cat', 'dog', 'mouse']
 
 
-def test_process_transaction_success_3():
-    """Test process_transaction('   3.5   ') == 3.6750000000000003"""
-    result = process_transaction('   3.5   ')
-    assert result == pytest.approx(3.6750000000000003)
+def test_choose_word_success_2():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['', ' ', '\t'])
+    assert result in ['', ' ', '\t']
 
 
-def test_process_transaction_success_4():
-    """Test process_transaction('nan') == float('nan')"""
-    result = process_transaction('nan')
-    assert result == pytest.approx(float('nan'), nan_ok=True)
+def test_choose_word_success_3():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['123', 'abc123', '!!!'])
+    assert result in ['123', 'abc123', '!!!']
 
 
-def test_process_transaction_success_5():
-    """Test process_transaction('inf') == float('inf')"""
-    result = process_transaction('inf')
-    assert result == pytest.approx(float('inf'))
+def test_choose_word_success_4():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['repeat', 'repeat', 'repeat'])
+    assert result in ['repeat', 'repeat', 'repeat']
 
 
-def test_process_transaction_success_6():
-    """Test process_transaction(True) == 1.05"""
-    result = process_transaction(True)
-    assert result == pytest.approx(1.05)
+def test_choose_word_success_5():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['word0', 'word1', 'word2', 'word3', 'word4', 'word5', 'word6', 'word7', 'word8', 'word9', 'word10', 'word11', 'word12', 'word13', 'word14', 'word15', 'word16', 'word17', 'word18', 'word19'])
+    assert result in ['word0', 'word1', 'word2', 'word3', 'word4', 'word5', 'word6', 'word7', 'word8', 'word9', 'word10', 'word11', 'word12', 'word13', 'word14', 'word15', 'word16', 'word17', 'word18', 'word19']
 
 
-def test_process_transaction_crash_0():
-    """Test process_transaction('-5') raises ValueError."""
+def test_choose_word_success_6():
+    """Test choose_word returns an element from its input."""
+    result = choose_word([42, 'hello', None])
+    assert result in [42, 'hello', None]
+
+
+def test_choose_word_success_7():
+    """Test choose_word returns an element from its input."""
+    result = choose_word(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'])
+    assert result in ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']
+
+
+def test_choose_word_crash_0():
+    """Test choose_word([]) raises IndexError."""
+    with pytest.raises(IndexError):
+        choose_word([])
+
+
+def test_has_player_won_success_0():
+    """Test has_player_won('apple', ['a', 'p', 'l', 'e']) == True"""
+    result = has_player_won('apple', ['a', 'p', 'l', 'e'])
+    assert result is True
+
+
+def test_has_player_won_success_1():
+    """Test has_player_won('banana', ['b', 'a', 'n']) == True"""
+    result = has_player_won('banana', ['b', 'a', 'n'])
+    assert result is True
+
+
+def test_has_player_won_success_2():
+    """Test has_player_won('test', []) == False"""
+    result = has_player_won('test', [])
+    assert result is False
+
+
+def test_has_player_won_success_3():
+    """Test has_player_won('', []) == True"""
+    result = has_player_won('', [])
+    assert result is True
+
+
+def test_has_player_won_success_4():
+    """Test has_player_won('abc', ['a', 'b', 'c', 'd']) == True"""
+    result = has_player_won('abc', ['a', 'b', 'c', 'd'])
+    assert result is True
+
+
+def test_has_player_won_success_5():
+    """Test has_player_won('xyz', ['x', 'y']) == False"""
+    result = has_player_won('xyz', ['x', 'y'])
+    assert result is False
+
+
+def test_has_player_won_success_6():
+    """Test has_player_won('mississippi', ['m', 'i', 's', 'p']) == True"""
+    result = has_player_won('mississippi', ['m', 'i', 's', 'p'])
+    assert result is True
+
+
+def test_has_player_won_success_7():
+    """Test has_player_won('hello', ['h', 'e', 'l', 'l', 'o']) == True"""
+    result = has_player_won('hello', ['h', 'e', 'l', 'l', 'o'])
+    assert result is True
+
+
+def test_has_player_won_success_8():
+    """Test has_player_won('dog', ['D', 'o', 'g']) == False"""
+    result = has_player_won('dog', ['D', 'o', 'g'])
+    assert result is False
+
+
+def test_get_word_progress_success_0():
+    """Test get_word_progress('', []) == ''"""
+    result = get_word_progress('', [])
+    assert result == ''
+
+
+def test_get_word_progress_success_1():
+    """Test get_word_progress('apple', []) == '_____'"""
+    result = get_word_progress('apple', [])
+    assert result == '_____'
+
+
+def test_get_word_progress_success_2():
+    """Test get_word_progress('apple', ['a', 'p', 'l', 'e']) == 'apple'"""
+    result = get_word_progress('apple', ['a', 'p', 'l', 'e'])
+    assert result == 'apple'
+
+
+def test_get_word_progress_success_3():
+    """Test get_word_progress('banana', ['a', 'b']) == 'ba_a_a'"""
+    result = get_word_progress('banana', ['a', 'b'])
+    assert result == 'ba_a_a'
+
+
+def test_get_word_progress_success_4():
+    """Test get_word_progress('mississippi', ['i', 's']) == '_ississi__i'"""
+    result = get_word_progress('mississippi', ['i', 's'])
+    assert result == '_ississi__i'
+
+
+def test_get_word_progress_success_5():
+    """Test get_word_progress('test', ['t', 't', 'e', 'x']) == 'te_t'"""
+    result = get_word_progress('test', ['t', 't', 'e', 'x'])
+    assert result == 'te_t'
+
+
+def test_get_word_progress_success_6():
+    """Test get_word_progress('xyz', ['X', 'Y', 'Z']) == '___'"""
+    result = get_word_progress('xyz', ['X', 'Y', 'Z'])
+    assert result == '___'
+
+
+def test_get_word_progress_success_7():
+    """Test get_word_progress('a', []) == '_'"""
+    result = get_word_progress('a', [])
+    assert result == '_'
+
+
+def test_get_word_progress_success_8():
+    """Test get_word_progress returns an element from its input."""
+    result = get_word_progress('a', ['a'])
+    assert result in 'a'
+
+
+def test_get_word_progress_success_9():
+    """Test get_word_progress('abacaba', ['b', 'c']) == '_b_c_b_'"""
+    result = get_word_progress('abacaba', ['b', 'c'])
+    assert result == '_b_c_b_'
+
+
+def test_get_available_letters_success_0():
+    """Test get_available_letters([]) == 'abcdefghijklmnopqrstuvwxyz'"""
+    result = get_available_letters([])
+    assert result == 'abcdefghijklmnopqrstuvwxyz'
+
+
+def test_get_available_letters_success_1():
+    """Test get_available_letters(['a', 'b', 'c']) == 'defghijklmnopqrstuvwxyz'"""
+    result = get_available_letters(['a', 'b', 'c'])
+    assert result == 'defghijklmnopqrstuvwxyz'
+
+
+def test_get_available_letters_success_2():
+    """Test get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']) == ''"""
+    result = get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+    assert result == ''
+
+
+def test_get_available_letters_success_3():
+    """Test get_available_letters(['a', 'a', 'b', 'c']) == 'defghijklmnopqrstuvwxyz'"""
+    result = get_available_letters(['a', 'a', 'b', 'c'])
+    assert result == 'defghijklmnopqrstuvwxyz'
+
+
+def test_get_available_letters_success_4():
+    """Test get_available_letters(['A', 'b', 'C']) == 'acdefghijklmnopqrstuvwxyz'"""
+    result = get_available_letters(['A', 'b', 'C'])
+    assert result == 'acdefghijklmnopqrstuvwxyz'
+
+
+def test_get_available_letters_success_5():
+    """Test get_available_letters(['z', 'x', 'q', 'a']) == 'bcdefghijklmnoprstuvwy'"""
+    result = get_available_letters(['z', 'x', 'q', 'a'])
+    assert result == 'bcdefghijklmnoprstuvwy'
+
+
+def test_get_available_letters_success_6():
+    """Test get_available_letters(['1', '!', 'a']) == 'bcdefghijklmnopqrstuvwxyz'"""
+    result = get_available_letters(['1', '!', 'a'])
+    assert result == 'bcdefghijklmnopqrstuvwxyz'
+
+
+def test_get_available_letters_success_7():
+    """Test get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c']) == ''"""
+    result = get_available_letters(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c'])
+    assert result == ''
+
+
+def test_get_available_letters_success_8():
+    """Test get_available_letters(['a', None]) == 'bcdefghijklmnopqrstuvwxyz'"""
+    result = get_available_letters(['a', None])
+    assert result == 'bcdefghijklmnopqrstuvwxyz'
+
+
+def test_revealed_success_0():
+    """Test revealed returns an element from its input."""
+    result = revealed('apple', 'aeiou')
+    assert result in 'apple'
+
+
+def test_revealed_success_1():
+    """Test revealed returns an element from its input."""
+    result = revealed('mississippi', 'sp')
+    assert result in 'mississippi'
+
+
+def test_revealed_success_2():
+    """Test revealed returns an element from its input."""
+    result = revealed('Aardvark', 'aArdv')
+    assert result in 'Aardvark'
+
+
+def test_revealed_success_3():
+    """Test revealed returns an element from its input."""
+    result = revealed('test123', 't1')
+    assert result in 'test123'
+
+
+def test_revealed_crash_0():
+    """Test revealed('banana', 'xyz') raises ValueError."""
     with pytest.raises(ValueError):
-        process_transaction('-5')
+        revealed('banana', 'xyz')
 
 
-def test_process_transaction_crash_1():
-    """Test process_transaction('0') raises ZeroDivisionError."""
-    with pytest.raises(ZeroDivisionError):
-        process_transaction('0')
+def test_revealed_crash_1():
+    """Test revealed('', 'abc') raises ValueError."""
+    with pytest.raises(ValueError):
+        revealed('', 'abc')
+
+
+def test_revealed_crash_2():
+    """Test revealed('hello', '') raises ValueError."""
+    with pytest.raises(ValueError):
+        revealed('hello', '')
+
+
+def test_unique_letters_success_0():
+    """Test unique_letters('') == 0"""
+    result = unique_letters('')
+    assert result == 0
+
+
+def test_unique_letters_success_1():
+    """Test unique_letters('a') == 1"""
+    result = unique_letters('a')
+    assert result == 1
+
+
+def test_unique_letters_success_2():
+    """Test unique_letters('aaaaa') == 1"""
+    result = unique_letters('aaaaa')
+    assert result == 1
+
+
+def test_unique_letters_success_3():
+    """Test unique_letters('abcabc') == 3"""
+    result = unique_letters('abcabc')
+    assert result == 3
+
+
+def test_unique_letters_success_4():
+    """Test unique_letters('abcdefghijklmnopqrstuvwxyz') == 26"""
+    result = unique_letters('abcdefghijklmnopqrstuvwxyz')
+    assert result == 26
+
+
+def test_unique_letters_success_5():
+    """Test unique_letters('AaBbCc') == 6"""
+    result = unique_letters('AaBbCc')
+    assert result == 6
+
+
+def test_unique_letters_success_6():
+    """Test unique_letters('Hello, World!') == 10"""
+    result = unique_letters('Hello, World!')
+    assert result == 10
+
+
+def test_unique_letters_success_7():
+    """Test unique_letters('Mississippi') == 4"""
+    result = unique_letters('Mississippi')
+    assert result == 4
+
+
+def test_unique_letters_success_8():
+    """Test unique_letters('1234567890') == 10"""
+    result = unique_letters('1234567890')
+    assert result == 10
+
+
+def test_unique_letters_success_9():
+    """Test unique_letters('😀😃😄😁😆😅😂🤣😊😇') == 10"""
+    result = unique_letters('😀😃😄😁😆😅😂🤣😊😇')
+    assert result == 10
 
