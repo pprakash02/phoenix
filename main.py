@@ -64,9 +64,10 @@ def extract_functions(file_path: str) -> list[dict]:
     return functions
 
 
-def build_mission_briefing(legacy_files: list[str]) -> str:
+def build_mission_briefing(legacy_files: list[str], file_contexts: dict) -> str:
     """
-    Generate a dynamic mission briefing with pre-read source code and function lists.
+    Generate a dynamic mission briefing with pre-read source code, function lists,
+    and human-provided context.
     """
     file_sections = []
 
@@ -77,8 +78,7 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
 
         # Extract functions
         funcs = extract_functions(fpath)
-        fname = os.path.basename(fpath)
-
+        
         testable = [fn for fn in funcs if fn["testable"]]
         skipped = [fn for fn in funcs if not fn["testable"]]
 
@@ -90,8 +90,12 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
             args_str = ", ".join(fn["args"])
             func_list += f"       - {fn['name']}({args_str})  [SKIP: {fn['reason']}]\n"
 
+        # --- NEW: INJECT HUMAN CONTEXT ---
+        human_context = file_contexts.get(fpath, "")
+        context_block = f"\n    [HUMAN INSTRUCTIONS FOR THIS FILE]:\n    {human_context}\n" if human_context else ""
+
         section = f"""
-    === {fpath} ===
+    === {fpath} ==={context_block}
     Functions found:
 {func_list}
     Source code:
@@ -191,6 +195,17 @@ async def run_phoenix() -> None:
         print(f"         → {f}  ({len(testable)} testable, {len(skipped)} skipped)")
     print()
 
+
+    print("\n--- HUMAN IN THE LOOP: PROVIDE CONTEXT ---")
+    file_contexts = {}
+    for f in legacy_files:
+        print(f"\nTarget File: {f}")
+        print("Provide context or specific test case requirements (e.g., 'Focus on edge cases for negative numbers').")
+        user_input = input("Your instructions (press Enter to skip): ").strip()
+        if user_input:
+            file_contexts[f] = user_input
+    print("\n------------------------------------------")
+
     # Clear old observer captures from previous runs
     captures_file = os.path.join(os.path.abspath("generated_tests"), "observer_captures.json")
     if os.path.exists(captures_file):
@@ -228,7 +243,7 @@ async def run_phoenix() -> None:
         max_rounds=15,
     ).build()
 
-    mission_briefing = build_mission_briefing(legacy_files)
+    mission_briefing = build_mission_briefing(legacy_files,file_contexts)
 
     print("[SYSTEM] Dispatching mission to Phoenix agents...\n")
 
