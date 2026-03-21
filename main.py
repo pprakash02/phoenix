@@ -7,6 +7,7 @@ import os
 from agents.observer import observer_agent
 from agents.qa_engineer import qa_engineer_agent
 from agents.critic import critic_agent
+from agents.doc_writer import doc_writer_agent
 
 # Agent Framework orchestration
 from agent_framework.orchestrations import GroupChatBuilder, GroupChatState
@@ -131,7 +132,13 @@ def build_mission_briefing(legacy_files: list[str]) -> str:
     3. Critic:
        - Call `verify_all_tests(dummy="")` to run ALL test suites in the sandbox.
        - If all pass, end your message with: PHOENIX_APPROVED
-       - If any fail, describe what needs fixing.
+       - If any fail, describe what needs fixing for the QA Engineer.
+
+    4. Doc_Writer (after Critic approves):
+       - Call `generate_docs` ONCE for each legacy .py file listed above.
+       - Just pass the file path, e.g.: generate_docs(legacy_file_path="legacy_workspace/hangman.py")
+       - Write a summary of what documentation was generated.
+       - End your message with: PHOENIX_DOCS_COMPLETE
     """
 
 
@@ -144,12 +151,23 @@ def round_robin_router(state: GroupChatState):
 
     Iterative fix loop (rounds 3+):
         QA_Engineer → Critic → QA_Engineer → Critic → ...
+        until Critic says PHOENIX_APPROVED.
+
+    Documentation phase (after approval):
+        Doc_Writer generates docs and signals PHOENIX_DOCS_COMPLETE.
     """
     order = ["Observer", "QA_Engineer", "Critic"]
 
     if state.current_round < len(order):
         return order[state.current_round]
 
+    # Check if the Critic has approved — if so, hand off to Doc_Writer
+    for msg in reversed(state.conversation):
+        text = getattr(msg, "text", None) or getattr(msg, "content", None) or ""
+        if "PHOENIX_APPROVED" in text:
+            return "Doc_Writer"
+
+    # Otherwise keep looping QA_Engineer ↔ Critic
     iteration = (state.current_round - len(order)) % 2
     return "QA_Engineer" if iteration == 0 else "Critic"
 
@@ -192,7 +210,7 @@ async def run_phoenix() -> None:
                 continue
                 
             text = getattr(msg, "text", None) or getattr(msg, "content", None) or ""
-            if "PHOENIX_APPROVED" in text:
+            if "PHOENIX_DOCS_COMPLETE" in text:
                 return True
             return False # Only care about the very last actual agent message
             
@@ -203,10 +221,11 @@ async def run_phoenix() -> None:
             observer_agent,
             qa_engineer_agent,
             critic_agent,
+            doc_writer_agent,
         ],
         selection_func=round_robin_router,
         termination_condition=should_terminate,
-        max_rounds=12,
+        max_rounds=15,
     ).build()
 
     mission_briefing = build_mission_briefing(legacy_files)

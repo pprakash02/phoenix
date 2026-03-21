@@ -1,43 +1,957 @@
 [
   {
-    "function": "process_transaction",
+    "function": "load_words",
     "inputs": {
-      "args": [
-        150
-      ],
+      "args": [],
       "kwargs": {}
     },
     "status": "success",
-    "output": 157.5,
+    "output": "[list of 55900 items]",
     "error": null,
     "module": "hangman"
   },
   {
-    "function": "process_transaction",
+    "function": "choose_word",
     "inputs": {
       "args": [
-        "250.75"
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": 263.2875,
+    "output": "cherry",
     "error": null,
     "module": "hangman"
   },
   {
-    "function": "process_transaction",
+    "function": "choose_word",
     "inputs": {
       "args": [
-        "-5"
+        [
+          "singleton"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "singleton",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        []
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ValueError: Transaction amount cannot be negative.",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 11, in process_transaction\n    raise ValueError(\"Transaction amount cannot be negative.\")\nValueError: Transaction amount cannot be negative.\n",
+    "error": "IndexError: list index out of range",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 40, in choose_word\n    return random.choice(wordlist)\n  File \"/usr/local/lib/python3.10/random.py\", line 378, in choice\n    return seq[self._randbelow(len(seq))]\nIndexError: list index out of range\n",
     "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        [
+          "repeat",
+          "repeat",
+          "unique"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "repeat",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        [
+          "good",
+          123,
+          null
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        [
+          ""
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        [
+          "Hello",
+          "world"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "Hello",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "choose_word",
+    "inputs": {
+      "args": [
+        [
+          "!@#",
+          "$%^"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "!@#",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "a",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "a",
+        [
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "apple",
+        [
+          "a",
+          "p",
+          "l",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "apple",
+        [
+          "a",
+          "p",
+          "l"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "banana",
+        [
+          "b",
+          "a",
+          "n"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "test",
+        [
+          "t",
+          "e",
+          "s",
+          "x"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "xyz",
+        [
+          "x",
+          "y",
+          "z",
+          "a",
+          "b"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "xyz",
+        [
+          "x",
+          "y"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "has_player_won",
+    "inputs": {
+      "args": [
+        "abc",
+        [
+          "a",
+          "b",
+          "c",
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "apple",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_____",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "apple",
+        [
+          "a",
+          "p",
+          "l",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "apple",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "banana",
+        [
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_a_a_a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "",
+        [
+          "a",
+          "b"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "test",
+        [
+          "t",
+          "x"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "t__t",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "mississippi",
+        [
+          "i",
+          "s"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_ississi__i",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "hello",
+        [
+          "l",
+          "l"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "__ll_",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "data",
+        [
+          "1",
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_a_a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_word_progress",
+    "inputs": {
+      "args": [
+        "xyz",
+        [
+          "x",
+          "y",
+          "z",
+          "extra"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "xyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "defghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "i",
+          "j",
+          "k",
+          "l",
+          "m",
+          "n",
+          "o",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "defghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "z",
+          "x",
+          "q",
+          "m"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "abcdefghijklnoprstuvwy",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "A",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "adefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "1",
+          "2",
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "bcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          null,
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "bcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          5,
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "bcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "get_available_letters",
+    "inputs": {
+      "args": [
+        [
+          "",
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "bcdefghijklmnopqrstuvwxyz",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "apple",
+        "aeiou"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "e",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "banana",
+        "b"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "b",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "mississippi",
+        "s"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "s",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "test",
+        "xyz"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "",
+        "abc"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "abc",
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: empty range for randrange() (0, 0, 0)",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "abc",
+        "abc"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "a",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "a1b2",
+        "12"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "2",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "!@#",
+        "#$%"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "#",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "revealed",
+    "inputs": {
+      "args": [
+        "abcd",
+        "ab"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "b",
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 0,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "aaaa"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 1,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "abcde"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 5,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "abca"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "aAaA"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 2,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "a1b2c3"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 6,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "a b c"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 4,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "\u00f1\u00e1\u00e9\u00ed\u00f3\u00fa"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 6,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "abc!@#"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 6,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "unique_letters",
+    "inputs": {
+      "args": [
+        "ab\nc"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 4,
+    "error": null,
+    "module": "hangman"
+  },
+  {
+    "function": "process_transaction",
+    "inputs": {
+      "args": [
+        100
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 105.0,
+    "error": null,
+    "module": "legacy_billing"
+  },
+  {
+    "function": "process_transaction",
+    "inputs": {
+      "args": [
+        "200.50"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 210.525,
+    "error": null,
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
@@ -50,72 +964,76 @@
     "status": "crashed",
     "output": null,
     "error": "ZeroDivisionError: division by zero",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 15, in process_transaction\n    return 100 / 0\nZeroDivisionError: division by zero\n",
-    "module": "hangman"
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 15, in process_transaction\n    return 100 / 0\nZeroDivisionError: division by zero\n",
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
     "inputs": {
       "args": [
-        "1e6"
+        -5
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 1050000.0,
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: Transaction amount cannot be negative.",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 11, in process_transaction\n    raise ValueError(\"Transaction amount cannot be negative.\")\nValueError: Transaction amount cannot be negative.\n",
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
     "inputs": {
       "args": [
-        "   3.5   "
+        " -3.14 "
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 3.6750000000000003,
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: Transaction amount cannot be negative.",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 11, in process_transaction\n    raise ValueError(\"Transaction amount cannot be negative.\")\nValueError: Transaction amount cannot be negative.\n",
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
     "inputs": {
       "args": [
-        "nan"
+        "1e3"
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": NaN,
+    "output": 1050.0,
     "error": null,
-    "module": "hangman"
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
     "inputs": {
       "args": [
-        "inf"
+        ""
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": Infinity,
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: could not convert string to float: ''",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 7, in process_transaction\n    val = float(amount)\nValueError: could not convert string to float: ''\n",
+    "module": "legacy_billing"
   },
   {
     "function": "process_transaction",
     "inputs": {
       "args": [
-        true
+        null
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 1.05,
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: float() argument must be a string or a real number, not 'NoneType'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 7, in process_transaction\n    val = float(amount)\nTypeError: float() argument must be a string or a real number, not 'NoneType'\n",
+    "module": "legacy_billing"
   }
 ]

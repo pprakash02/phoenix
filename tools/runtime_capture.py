@@ -237,6 +237,11 @@ def _generate_inputs_via_llm(func_node: _ast.FunctionDef, source_code: str) -> l
     # Extract the function's source code roughly
     func_source = _ast.unparse(func_node) if hasattr(_ast, 'unparse') else f"def {func_node.name}(...)"
     
+    # Truncate source context to avoid overwhelming the LLM with huge files
+    source_context = source_code[:3000]
+    if len(source_code) > 3000:
+        source_context += "\n# ... (truncated for brevity)"
+
     prompt = f"""
 You are an expert software fuzzer. Your job is to generate a diverse set of valid and edge-case inputs for a Python function.
 
@@ -249,9 +254,9 @@ Here is the function's source code:
 {func_source}
 ```
 
-For context, here is the full file source code:
+For context, here is the file source code (may be truncated):
 ```python
-{source_code}
+{source_context}
 ```
 
 Please generate 5-10 distinct combinations of inputs to test this function thoroughly.
@@ -264,6 +269,7 @@ For a function with 1 argument like `def foo(x)`, return:
 For a function with 2 arguments like `def bar(a, b)`, return:
 {{"test_inputs": [["hello", 42], ["", 0], ["edge", -1]]}}
 
+IMPORTANT: Keep string and list values SHORT. Do not generate huge data structures.
 Return ONLY valid JSON. Do not include markdown code blocks or any other explanation.
 """
     
@@ -331,9 +337,78 @@ Return ONLY valid JSON. Do not include markdown code blocks or any other explana
             
     print(f"Warning: Failed to generate LLM fuzzing inputs for {func_node.name} after {max_retries} attempts: {last_error}")
         
-    # Fallback: generate simple default inputs based on arg count
-    print(f"[SYSTEM] Using fallback inputs for {func_node.name}")
-    return [[0 for _ in args], [1 for _ in args], [-1 for _ in args]]
+    # Smart fallback: infer argument types from function source and generate appropriate inputs
+    print(f"[SYSTEM] Using smart fallback inputs for {func_node.name}")
+    return _smart_fallback_inputs(func_node, source_code)
+
+
+def _smart_fallback_inputs(func_node: _ast.FunctionDef, source_code: str) -> list:
+    """Generate type-aware fallback inputs by inspecting the function's AST and arg names."""
+    args = [a.arg for a in func_node.args.args]
+    if not args:
+        return [[]]
+
+    func_source = _ast.unparse(func_node) if hasattr(_ast, 'unparse') else ""
+
+    def _infer_input_for_arg(arg_name: str) -> list:
+        """Return a list of candidate values for a single argument based on heuristics."""
+        name = arg_name.lower()
+
+        # List/collection heuristics
+        if any(hint in name for hint in ["list", "words", "items", "array", "elements",
+                                          "letters", "guessed", "choices", "options"]):
+            return [
+                ["apple", "banana", "cherry"],
+                ["a", "b", "c", "d", "e"],
+                [],
+                ["hello"],
+                ["test", "word", "example", "data", "value"],
+            ]
+
+        # String heuristics
+        if any(hint in name for hint in ["word", "string", "text", "name", "letter",
+                                          "char", "secret", "message", "path", "file"]):
+            return ["hello", "test", "", "a", "abcdef", "python"]
+
+        # Boolean heuristics
+        if any(hint in name for hint in ["flag", "is_", "has_", "with_", "enable",
+                                          "should", "allow", "help"]):
+            return [True, False]
+
+        # Numeric heuristics
+        if any(hint in name for hint in ["num", "count", "amount", "size", "length",
+                                          "index", "val", "price", "total", "n"]):
+            return [0, 1, -1, 10, 100, 0.5]
+
+        # Also check how the arg is used in the function body
+        if func_source:
+            # If it's iterated over or indexed, probably a list/str
+            if f"for " in func_source and f" in {arg_name}" in func_source:
+                return ["hello", "test", "", "abcde"]
+            if f"{arg_name}[" in func_source:
+                return [["a", "b", "c"], ["test"], [1, 2, 3]]
+            if f"len({arg_name})" in func_source:
+                return ["hello", "test", "", [1, 2, 3]]
+
+        # Default: try multiple types
+        return [0, 1, -1, "test", "", True]
+
+    # Generate combinations
+    per_arg_values = [_infer_input_for_arg(a) for a in args]
+    num_args = len(args)
+
+    if num_args == 1:
+        return [[v] for v in per_arg_values[0]]
+
+    # For multi-arg functions, zip across the candidate lists
+    max_len = max(len(vals) for vals in per_arg_values)
+    inputs = []
+    for i in range(min(max_len, 8)):
+        combo = []
+        for vals in per_arg_values:
+            combo.append(vals[i % len(vals)])
+        inputs.append(combo)
+    return inputs
 
 def _extract_testable_functions(file_path: str) -> list[dict]:
     """Parse a Python file's AST to extract testable function definitions."""
