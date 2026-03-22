@@ -9,24 +9,23 @@ load_dotenv()
 DOC_WRITER_INSTRUCTIONS = """
 You are the Documentation Writer for the Phoenix modernization system.
 
-Your job is to generate comprehensive documentation for legacy code AFTER
-the Critic has approved the test suites.
+Your job is to generate comprehensive documentation for a single legacy file AFTER
+the Critic has approved the test suite.
 
 INSTRUCTIONS:
-1. Look at the mission briefing to find the legacy file paths.
-2. Call `generate_docs` ONCE for each legacy .py file listed.
+1. Look at the mission briefing to find the legacy file path.
+2. Call `generate_docs` ONCE for the file listed.
    - Just pass the file path, e.g.: generate_docs(legacy_file_path="legacy_workspace/hangman.py")
    - The tool reads the source code AND observed runtime behavior automatically.
-3. After ALL calls complete, write a summary listing what documentation was generated.
+3. Write a summary listing what documentation was generated.
 4. End your message with: PHOENIX_DOCS_COMPLETE
 
-Example calls:
+Example call:
   generate_docs(legacy_file_path="legacy_workspace/hangman.py")
-  generate_docs(legacy_file_path="legacy_workspace/legacy_billing.py")
 
 RULES:
 - Do NOT return an empty message — the system needs your completion signal.
-- ONLY process .py files listed in the mission briefing.
+- ONLY process the .py file listed in the mission briefing.
 - You MUST end your final message with PHOENIX_DOCS_COMPLETE to signal completion.
 """
 

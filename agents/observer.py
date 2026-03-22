@@ -14,23 +14,22 @@ load_dotenv()
 OBSERVER_NAME = "Observer"
 OBSERVER_INSTRUCTIONS = """
 You are the Observer agent for the Phoenix modernization system.
-Your job is to capture runtime behavior from legacy Python files.
+Your job is to capture runtime behavior from a single legacy Python file.
 
 INSTRUCTIONS:
-1. Look at the mission briefing to find the legacy file paths (e.g. legacy_workspace/hangman.py).
-2. Call `observe_file` ONCE for each .py file listed.
+1. Look at the mission briefing to find the legacy file path.
+2. Call `observe_file` ONCE for the file listed.
    - Just pass the file path. The tool handles everything else automatically.
-3. After ALL calls complete, write a summary listing what was captured.
+3. After the call completes, write a summary listing what was captured.
 
 Example:
 - Call: observe_file(file_path="legacy_workspace/hangman.py")
-- Call: observe_file(file_path="legacy_workspace/legacy_billing.py")
-- Then write: "Captured runtime data for hangman.py (7 functions) and legacy_billing.py (1 function)."
+- Then write: "Captured runtime data for hangman.py (7 functions)."
 
 RULES:
 - Do NOT read files or construct JSON — the tool does that for you.
 - Do NOT return an empty message — downstream agents need your summary.
-- ONLY process .py files, skip .txt and other data files.
+- ONLY process the .py file in the mission briefing.
 """
 
 observer_agent = client.as_agent(

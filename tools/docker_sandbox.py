@@ -60,12 +60,16 @@ def run_legacy_code_in_sandbox(
             working_dir="/workspace",
             mem_limit="256m",
             cpu_period=100000,
-            cpu_quota=50000
+            cpu_quota=50000,
+            stderr=True
         )
         logs_str = raw_logs.decode('utf-8') if isinstance(raw_logs, bytes) else str(raw_logs)
         return f"Execution Successful. Output Logs:\n{logs_str}"
     except docker.errors.ContainerError as e:
-        error_msg = e.stderr.decode('utf-8') if isinstance(e.stderr, bytes) else str(e.stderr)
+        # With stderr=True, both stdout and stderr are merged into e.stderr
+        error_msg = ""
+        if e.stderr:
+            error_msg = e.stderr.decode('utf-8') if isinstance(e.stderr, bytes) else str(e.stderr)
         return f"Execution Failed with Exit Code {e.exit_status}.\nError Logs:\n{error_msg}"
     except Exception as e:
         return f"Sandbox Fault: Could not execute environment. {str(e)}"

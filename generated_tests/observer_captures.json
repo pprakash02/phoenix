@@ -1,17 +1,613 @@
 [
   {
-    "function": "load_words",
+    "function": "sum_digits",
     "inputs": {
-      "args": [],
+      "args": [
+        "hello"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "sum_digits",
+    "inputs": {
+      "args": [
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "sum_digits",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "sum_digits",
+    "inputs": {
+      "args": [
+        "a"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "sum_digits",
+    "inputs": {
+      "args": [
+        "abcdef"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "sum_digits",
+    "inputs": {
+      "args": [
+        "python"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: No digits in input",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3.py\", line 17, in sum_digits\n    raise ValueError('No digits in input')\nValueError: No digits in input\n",
+    "module": "Problem 3"
+  },
+  {
+    "function": "f",
+    "inputs": {
+      "args": [
+        0
+      ],
       "kwargs": {}
     },
     "status": "success",
-    "output": "[list of 55900 items]",
+    "output": 3,
     "error": null,
-    "module": "hangman"
+    "module": "Problem 2"
   },
   {
-    "function": "choose_word",
+    "function": "f",
+    "inputs": {
+      "args": [
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "Problem 2"
+  },
+  {
+    "function": "f",
+    "inputs": {
+      "args": [
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "Problem 2"
+  },
+  {
+    "function": "f",
+    "inputs": {
+      "args": [
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "Problem 2"
+  },
+  {
+    "function": "f",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "Problem 2"
+  },
+  {
+    "function": "f",
+    "inputs": {
+      "args": [
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": 3,
+    "error": null,
+    "module": "Problem 2"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 4"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 4"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "ValueError: math domain error",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4.py\", line 24, in is_triangular\n    x = (math.sqrt(8*k + 1) - 1) / 2\nValueError: math domain error\n",
+    "module": "Problem 4"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: can only concatenate str (not \"int\") to str",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4.py\", line 24, in is_triangular\n    x = (math.sqrt(8*k + 1) - 1) / 2\nTypeError: can only concatenate str (not \"int\") to str\n",
+    "module": "Problem 4"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: can only concatenate str (not \"int\") to str",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4.py\", line 24, in is_triangular\n    x = (math.sqrt(8*k + 1) - 1) / 2\nTypeError: can only concatenate str (not \"int\") to str\n",
+    "module": "Problem 4"
+  },
+  {
+    "function": "is_triangular",
+    "inputs": {
+      "args": [
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 4"
+  },
+  {
+    "function": "dict_invert",
+    "inputs": {
+      "args": [
+        "hello"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'str' object has no attribute 'items'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 7.py\", line 29, in dict_invert\n    for k, v in d.items():\nAttributeError: 'str' object has no attribute 'items'\n",
+    "module": "Problem 7"
+  },
+  {
+    "function": "dict_invert",
+    "inputs": {
+      "args": [
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'str' object has no attribute 'items'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 7.py\", line 29, in dict_invert\n    for k, v in d.items():\nAttributeError: 'str' object has no attribute 'items'\n",
+    "module": "Problem 7"
+  },
+  {
+    "function": "dict_invert",
+    "inputs": {
+      "args": [
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'str' object has no attribute 'items'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 7.py\", line 29, in dict_invert\n    for k, v in d.items():\nAttributeError: 'str' object has no attribute 'items'\n",
+    "module": "Problem 7"
+  },
+  {
+    "function": "dict_invert",
+    "inputs": {
+      "args": [
+        "abcde"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'str' object has no attribute 'items'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 7.py\", line 29, in dict_invert\n    for k, v in d.items():\nAttributeError: 'str' object has no attribute 'items'\n",
+    "module": "Problem 7"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        0,
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 9.py\", line 43, in is_list_permutation\n    c = Counter(L1)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 577, in __init__\n    self.update(iterable, **kwds)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 670, in update\n    _count_elements(self, iterable)\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 9"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        1,
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 9.py\", line 43, in is_list_permutation\n    c = Counter(L1)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 577, in __init__\n    self.update(iterable, **kwds)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 670, in update\n    _count_elements(self, iterable)\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 9"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        -1,
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 9.py\", line 43, in is_list_permutation\n    c = Counter(L1)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 577, in __init__\n    self.update(iterable, **kwds)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 670, in update\n    _count_elements(self, iterable)\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 9"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        "test",
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": [
+      "t",
+      2,
+      "<class 'str'>"
+    ],
+    "error": null,
+    "module": "Problem 9"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        "",
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": [
+      null,
+      null,
+      null
+    ],
+    "error": null,
+    "module": "Problem 9"
+  },
+  {
+    "function": "is_list_permutation",
+    "inputs": {
+      "args": [
+        true,
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'bool' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 9.py\", line 43, in is_list_permutation\n    c = Counter(L1)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 577, in __init__\n    self.update(iterable, **kwds)\n  File \"/usr/local/lib/python3.10/collections/__init__.py\", line 670, in update\n    _count_elements(self, iterable)\nTypeError: 'bool' object is not iterable\n",
+    "module": "Problem 9"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "hello",
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "test",
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "a",
+        [
+          "hello"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "abcdef",
+        [
+          "test",
+          "word",
+          "example",
+          "data",
+          "value"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "isWordGuessed",
+    "inputs": {
+      "args": [
+        "python",
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 1 - Is the Word Guessed"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "hello",
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_____",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "test",
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_e__",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "",
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "a",
+        [
+          "hello"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "_",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "abcdef",
+        [
+          "test",
+          "word",
+          "example",
+          "data",
+          "value"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "______",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getGuessedWord",
+    "inputs": {
+      "args": [
+        "python",
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": "______",
+    "error": null,
+    "module": "Problem 2 - Printing Out the User's Guess"
+  },
+  {
+    "function": "getAvailableLetters",
     "inputs": {
       "args": [
         [
@@ -23,451 +619,31 @@
       "kwargs": {}
     },
     "status": "success",
-    "output": "cherry",
+    "output": "abcdefghijklmnopqrstuvwxyz",
     "error": null,
-    "module": "hangman"
+    "module": "Problem 3 - Printing Out all Available Letters"
   },
   {
-    "function": "choose_word",
+    "function": "getAvailableLetters",
     "inputs": {
       "args": [
-        [
-          "singleton"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "singleton",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        []
-      ],
-      "kwargs": {}
-    },
-    "status": "crashed",
-    "output": null,
-    "error": "IndexError: list index out of range",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 40, in choose_word\n    return random.choice(wordlist)\n  File \"/usr/local/lib/python3.10/random.py\", line 378, in choice\n    return seq[self._randbelow(len(seq))]\nIndexError: list index out of range\n",
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        [
-          "repeat",
-          "repeat",
-          "unique"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "repeat",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        [
-          "good",
-          123,
-          null
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": null,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        [
-          ""
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        [
-          "Hello",
-          "world"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "Hello",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "choose_word",
-    "inputs": {
-      "args": [
-        [
-          "!@#",
-          "$%^"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "!@#",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "",
-        []
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "a",
-        []
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": false,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "a",
-        [
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "apple",
-        [
-          "a",
-          "p",
-          "l",
-          "e"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "apple",
-        [
-          "a",
-          "p",
-          "l"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": false,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "banana",
-        [
-          "b",
-          "a",
-          "n"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "test",
-        [
-          "t",
-          "e",
-          "s",
-          "x"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "xyz",
-        [
-          "x",
-          "y",
-          "z",
-          "a",
-          "b"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "xyz",
-        [
-          "x",
-          "y"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": false,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "has_player_won",
-    "inputs": {
-      "args": [
-        "abc",
         [
           "a",
           "b",
           "c",
-          "a",
-          "b",
-          "c"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": true,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "apple",
-        []
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "_____",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "apple",
-        [
-          "a",
-          "p",
-          "l",
+          "d",
           "e"
         ]
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": "apple",
+    "output": "fghijklmnopqrstuvwxyz",
     "error": null,
-    "module": "hangman"
+    "module": "Problem 3 - Printing Out all Available Letters"
   },
   {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "banana",
-        [
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "_a_a_a",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "",
-        [
-          "a",
-          "b"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "test",
-        [
-          "t",
-          "x"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "t__t",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "mississippi",
-        [
-          "i",
-          "s"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "_ississi__i",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "hello",
-        [
-          "l",
-          "l"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "__ll_",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "data",
-        [
-          "1",
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "_a_a",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_word_progress",
-    "inputs": {
-      "args": [
-        "xyz",
-        [
-          "x",
-          "y",
-          "z",
-          "extra"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "xyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
+    "function": "getAvailableLetters",
     "inputs": {
       "args": [
         []
@@ -477,563 +653,743 @@
     "status": "success",
     "output": "abcdefghijklmnopqrstuvwxyz",
     "error": null,
-    "module": "hangman"
+    "module": "Problem 3 - Printing Out all Available Letters"
   },
   {
-    "function": "get_available_letters",
+    "function": "getAvailableLetters",
     "inputs": {
       "args": [
         [
-          "a",
-          "b",
-          "c"
+          "hello"
         ]
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": "defghijklmnopqrstuvwxyz",
+    "output": "abcdefghijklmnopqrstuvwxyz",
     "error": null,
-    "module": "hangman"
+    "module": "Problem 3 - Printing Out all Available Letters"
   },
   {
-    "function": "get_available_letters",
+    "function": "getAvailableLetters",
     "inputs": {
       "args": [
         [
-          "a",
-          "b",
-          "c",
-          "d",
-          "e",
-          "f",
-          "g",
-          "h",
-          "i",
-          "j",
-          "k",
-          "l",
-          "m",
-          "n",
-          "o",
-          "p",
-          "q",
-          "r",
-          "s",
-          "t",
-          "u",
-          "v",
-          "w",
-          "x",
-          "y",
-          "z"
+          "test",
+          "word",
+          "example",
+          "data",
+          "value"
         ]
       ],
       "kwargs": {}
     },
     "status": "success",
-    "output": "",
+    "output": "abcdefghijklmnopqrstuvwxyz",
     "error": null,
-    "module": "hangman"
+    "module": "Problem 3 - Printing Out all Available Letters"
   },
   {
-    "function": "get_available_letters",
+    "function": "getWordScore",
     "inputs": {
       "args": [
-        [
-          "a",
-          "a",
-          "b",
-          "c"
-        ]
+        "hello",
+        0
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": "defghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "NameError: name 'SCRABBLE_LETTER_VALUES' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 1 - Word Scores.py\", line 48, in getWordScore\n    wordScore += SCRABBLE_LETTER_VALUES[theLetter]\nNameError: name 'SCRABBLE_LETTER_VALUES' is not defined\n",
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          "z",
-          "x",
-          "q",
-          "m"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "abcdefghijklnoprstuvwy",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          "A",
-          "b",
-          "c"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "adefghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          "1",
-          "2",
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "bcdefghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          null,
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "bcdefghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          5,
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "bcdefghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "get_available_letters",
-    "inputs": {
-      "args": [
-        [
-          "",
-          "a"
-        ]
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "bcdefghijklmnopqrstuvwxyz",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "apple",
-        "aeiou"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "e",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "banana",
-        "b"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "b",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "mississippi",
-        "s"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "s",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
+    "function": "getWordScore",
     "inputs": {
       "args": [
         "test",
-        "xyz"
+        1
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ValueError: empty range for randrange() (0, 0, 0)",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
-    "module": "hangman"
+    "error": "NameError: name 'SCRABBLE_LETTER_VALUES' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 1 - Word Scores.py\", line 48, in getWordScore\n    wordScore += SCRABBLE_LETTER_VALUES[theLetter]\nNameError: name 'SCRABBLE_LETTER_VALUES' is not defined\n",
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "revealed",
+    "function": "getWordScore",
     "inputs": {
       "args": [
         "",
-        "abc"
-      ],
-      "kwargs": {}
-    },
-    "status": "crashed",
-    "output": null,
-    "error": "ValueError: empty range for randrange() (0, 0, 0)",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "abc",
-        ""
-      ],
-      "kwargs": {}
-    },
-    "status": "crashed",
-    "output": null,
-    "error": "ValueError: empty range for randrange() (0, 0, 0)",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/hangman.py\", line 107, in revealed\n    new = random.randint(0, len(choose_from)-1)\n  File \"/usr/local/lib/python3.10/random.py\", line 370, in randint\n    return self.randrange(a, b+1)\n  File \"/usr/local/lib/python3.10/random.py\", line 353, in randrange\n    raise ValueError(\"empty range for randrange() (%d, %d, %d)\" % (istart, istop, width))\nValueError: empty range for randrange() (0, 0, 0)\n",
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "abc",
-        "abc"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "a",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "a1b2",
-        "12"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "2",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "!@#",
-        "#$%"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "#",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "revealed",
-    "inputs": {
-      "args": [
-        "abcd",
-        "ab"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": "b",
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        ""
+        -1
       ],
       "kwargs": {}
     },
     "status": "success",
     "output": 0,
     "error": null,
-    "module": "hangman"
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "unique_letters",
+    "function": "getWordScore",
     "inputs": {
       "args": [
-        "aaaa"
+        "a",
+        10
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 1,
-    "error": null,
-    "module": "hangman"
+    "status": "crashed",
+    "output": null,
+    "error": "NameError: name 'SCRABBLE_LETTER_VALUES' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 1 - Word Scores.py\", line 48, in getWordScore\n    wordScore += SCRABBLE_LETTER_VALUES[theLetter]\nNameError: name 'SCRABBLE_LETTER_VALUES' is not defined\n",
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "unique_letters",
+    "function": "getWordScore",
     "inputs": {
       "args": [
-        "abcde"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 5,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "abca"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 3,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "aAaA"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 2,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "a1b2c3"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 6,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "a b c"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 4,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "\u00f1\u00e1\u00e9\u00ed\u00f3\u00fa"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 6,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "abc!@#"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 6,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "unique_letters",
-    "inputs": {
-      "args": [
-        "ab\nc"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 4,
-    "error": null,
-    "module": "hangman"
-  },
-  {
-    "function": "process_transaction",
-    "inputs": {
-      "args": [
+        "abcdef",
         100
       ],
       "kwargs": {}
     },
-    "status": "success",
-    "output": 105.0,
-    "error": null,
-    "module": "legacy_billing"
+    "status": "crashed",
+    "output": null,
+    "error": "NameError: name 'SCRABBLE_LETTER_VALUES' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 1 - Word Scores.py\", line 48, in getWordScore\n    wordScore += SCRABBLE_LETTER_VALUES[theLetter]\nNameError: name 'SCRABBLE_LETTER_VALUES' is not defined\n",
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "process_transaction",
+    "function": "getWordScore",
     "inputs": {
       "args": [
-        "200.50"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 210.525,
-    "error": null,
-    "module": "legacy_billing"
-  },
-  {
-    "function": "process_transaction",
-    "inputs": {
-      "args": [
-        "0"
+        "python",
+        0.5
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ZeroDivisionError: division by zero",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 15, in process_transaction\n    return 100 / 0\nZeroDivisionError: division by zero\n",
-    "module": "legacy_billing"
+    "error": "NameError: name 'SCRABBLE_LETTER_VALUES' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 1 - Word Scores.py\", line 48, in getWordScore\n    wordScore += SCRABBLE_LETTER_VALUES[theLetter]\nNameError: name 'SCRABBLE_LETTER_VALUES' is not defined\n",
+    "module": "Problem 1 - Word Scores"
   },
   {
-    "function": "process_transaction",
+    "function": "updateHand",
     "inputs": {
       "args": [
-        -5
+        0,
+        "hello"
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ValueError: Transaction amount cannot be negative.",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 11, in process_transaction\n    raise ValueError(\"Transaction amount cannot be negative.\")\nValueError: Transaction amount cannot be negative.\n",
-    "module": "legacy_billing"
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
   },
   {
-    "function": "process_transaction",
+    "function": "updateHand",
     "inputs": {
       "args": [
-        " -3.14 "
+        1,
+        "test"
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ValueError: Transaction amount cannot be negative.",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 11, in process_transaction\n    raise ValueError(\"Transaction amount cannot be negative.\")\nValueError: Transaction amount cannot be negative.\n",
-    "module": "legacy_billing"
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
   },
   {
-    "function": "process_transaction",
+    "function": "updateHand",
     "inputs": {
       "args": [
-        "1e3"
-      ],
-      "kwargs": {}
-    },
-    "status": "success",
-    "output": 1050.0,
-    "error": null,
-    "module": "legacy_billing"
-  },
-  {
-    "function": "process_transaction",
-    "inputs": {
-      "args": [
+        -1,
         ""
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "ValueError: could not convert string to float: ''",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 7, in process_transaction\n    val = float(amount)\nValueError: could not convert string to float: ''\n",
-    "module": "legacy_billing"
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
   },
   {
-    "function": "process_transaction",
+    "function": "updateHand",
     "inputs": {
       "args": [
-        null
+        10,
+        "a"
       ],
       "kwargs": {}
     },
     "status": "crashed",
     "output": null,
-    "error": "TypeError: float() argument must be a string or a real number, not 'NoneType'",
-    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 28, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/legacy_billing.py\", line 7, in process_transaction\n    val = float(amount)\nTypeError: float() argument must be a string or a real number, not 'NoneType'\n",
-    "module": "legacy_billing"
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
+  },
+  {
+    "function": "updateHand",
+    "inputs": {
+      "args": [
+        100,
+        "abcdef"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
+  },
+  {
+    "function": "updateHand",
+    "inputs": {
+      "args": [
+        0.5,
+        "python"
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'float' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 2 - Dealing with Hands.py\", line 76, in updateHand\n    updatedHand = hand.copy()\nAttributeError: 'float' object has no attribute 'copy'\n",
+    "module": "Problem 2 - Dealing with Hands"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "hello",
+        0,
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "test",
+        1,
+        [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "",
+        -1,
+        []
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "a",
+        10,
+        [
+          "hello"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "abcdef",
+        100,
+        [
+          "test",
+          "word",
+          "example",
+          "data",
+          "value"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'int' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'int' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "isValidWord",
+    "inputs": {
+      "args": [
+        "python",
+        0.5,
+        [
+          "apple",
+          "banana",
+          "cherry"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "AttributeError: 'float' object has no attribute 'copy'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 3 - Valid Words.py\", line 31, in isValidWord\n    handtemp=hand.copy()\nAttributeError: 'float' object has no attribute 'copy'\n",
+    "module": "Problem 3 - Valid Words"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        10
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        100
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'int' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'int' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "calculateHandlen",
+    "inputs": {
+      "args": [
+        0.5
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: 'float' object is not iterable",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Hand Length.py\", line 16, in calculateHandlen\n    for letter in hand:\nTypeError: 'float' object is not iterable\n",
+    "module": "Problem 4 - Hand Length"
+  },
+  {
+    "function": "decrypt_story",
+    "inputs": {
+      "args": [],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "NameError: name 'CiphertextMessage' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 4 - Decrypt a Story.py\", line 14, in decrypt_story\n    joke_code = CiphertextMessage(get_story_string())\nNameError: name 'CiphertextMessage' is not defined\n",
+    "module": "Problem 4 - Decrypt a Story"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: '>' not supported between instances of 'str' and 'int'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 5.py\", line 8, in search\n    if L[i] > e:\nTypeError: '>' not supported between instances of 'str' and 'int'\n",
+    "module": "Problem 5"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ],
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: '>' not supported between instances of 'str' and 'int'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 5.py\", line 8, in search\n    if L[i] > e:\nTypeError: '>' not supported between instances of 'str' and 'int'\n",
+    "module": "Problem 5"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ],
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "search",
+    "inputs": {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        0
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: '<' not supported between instances of 'str' and 'int'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 5.py\", line 18, in newsearch\n    if L[i] < e:\nTypeError: '<' not supported between instances of 'str' and 'int'\n",
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ],
+        1
+      ],
+      "kwargs": {}
+    },
+    "status": "crashed",
+    "output": null,
+    "error": "TypeError: '<' not supported between instances of 'str' and 'int'",
+    "traceback": "Traceback (most recent call last):\n  File \"/workspace/phoenix_harness.py\", line 35, in wrapper\n    result = func(*args, **kwargs)\n  File \"/workspace/Problem 5.py\", line 18, in newsearch\n    if L[i] < e:\nTypeError: '<' not supported between instances of 'str' and 'int'\n",
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        -1
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        "test"
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ],
+        ""
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": false,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "newsearch",
+    "inputs": {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        true
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": true,
+    "error": null,
+    "module": "Problem 5"
+  },
+  {
+    "function": "swapSort",
+    "inputs": {
+      "args": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
+  },
+  {
+    "function": "swapSort",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
+  },
+  {
+    "function": "swapSort",
+    "inputs": {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
+  },
+  {
+    "function": "modSwapSort",
+    "inputs": {
+      "args": [
+        [
+          "c",
+          "b",
+          "a"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
+  },
+  {
+    "function": "modSwapSort",
+    "inputs": {
+      "args": [
+        [
+          "test"
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
+  },
+  {
+    "function": "modSwapSort",
+    "inputs": {
+      "args": [
+        [
+          3,
+          2,
+          1
+        ]
+      ],
+      "kwargs": {}
+    },
+    "status": "success",
+    "output": null,
+    "error": null,
+    "module": "Problem 6"
   }
 ]

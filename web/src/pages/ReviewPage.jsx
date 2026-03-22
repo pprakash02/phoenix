@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { getResults, approveTests, rejectTests } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 import './ReviewPage.css';
@@ -142,7 +143,13 @@ function ReviewPage({ sessionData }) {
           </div>
 
           <div className="code-content">
-            <pre><code>{testFiles[activeTab] || docFiles[activeTab] || 'Select a file to view'}</code></pre>
+            {activeTab && docFiles[activeTab] ? (
+              <div className="markdown-content">
+                <ReactMarkdown>{docFiles[activeTab]}</ReactMarkdown>
+              </div>
+            ) : (
+              <pre><code>{testFiles[activeTab] || 'Select a file to view'}</code></pre>
+            )}
           </div>
         </div>
 

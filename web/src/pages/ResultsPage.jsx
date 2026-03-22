@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { getResults, getDownloadUrl, createPR } from '../services/api';
 import './ResultsPage.css';
 
@@ -140,7 +141,13 @@ function ResultsPage({ sessionData }) {
             ))}
           </div>
           <div className="code-content">
-            <pre><code>{docFiles[activeTab] || testFiles[activeTab] || 'Select a file to view'}</code></pre>
+            {activeTab && docFiles[activeTab] ? (
+              <div className="markdown-content">
+                <ReactMarkdown>{docFiles[activeTab]}</ReactMarkdown>
+              </div>
+            ) : (
+              <pre><code>{testFiles[activeTab] || 'Select a file to view'}</code></pre>
+            )}
           </div>
         </div>
 

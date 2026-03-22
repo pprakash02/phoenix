@@ -2,3 +2,14 @@ docker
 agent-framework
 python-dotenv
 pydantic
+flask
+flask-socketio
+flask-cors
+gunicorn
+eventlet
+pygithub
+azure-cosmos
+gitpython
+markdown
+pymupdf
+weasyprint
