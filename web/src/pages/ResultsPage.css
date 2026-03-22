@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════
+   RESULTS PAGE
+   ═══════════════════════════════════════════════════ */
+
+.results-page {
+  padding: var(--space-xl) 0;
+}
+
+/* Summary Cards */
+.results-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.summary-card.success {
+  border-left: 3px solid var(--color-success);
+}
+
+.summary-card.info {
+  border-left: 3px solid var(--color-accent);
+}
+
+.summary-card.neutral {
+  border-left: 3px solid var(--color-warning);
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+}
+
+.summary-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Actions */
+.results-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.download-btn {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.pr-btn {
+  background: #8b5cf6;
+}
+
+.pr-btn:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
+/* PR Modal extras */
+.pr-modal {
+  max-width: 560px;
+}
+
+.pr-success {
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.pr-success-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.pr-success p {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.pr-link {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: all var(--transition-fast);
+}
+
+.pr-link:hover {
+  background: var(--color-accent-hover);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* New Project */
+.new-project-section {
+  padding: var(--space-lg) 0;
+  border-top: 1px solid var(--color-border);
+}
