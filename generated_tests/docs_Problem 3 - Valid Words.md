@@ -1,48 +1,41 @@
 # Module: `Problem 3 - Valid Words`
 
-> This module provides utilities for validating whether a candidate word can be formed from a given hand of letters and appears in a supplied word list. The primary function, `isValidWord`, checks both membership in the word list and availability of required letters without mutating the input hand.
+> This module provides a utility to verify whether a given word is both present in a supplied dictionary of valid words and can be formed using the letters available in a player's hand. The core function performs the check without mutating its inputs.
 
 ## Functions
 
 ### `isValidWord(word, hand, wordList)`
 
 **Description**:  
-Determines if `word` is a valid entry by confirming two conditions: (1) the word exists in `wordList`, and (2) every character of the word can be taken from `hand` with sufficient quantity. The function works on a copy of `hand`, leaving the original dictionary unchanged.
+Determines if `word` is a valid entry (i.e., it exists in `wordList`) **and** can be constructed entirely from the letters available in `hand`. The function does **not** modify `hand` or `wordList`. It returns `True` only when both conditions are satisfied; otherwise it returns `False`.
 
 **Parameters**:
-- `word` (*str*): The candidate word to validate. Must be a non‑empty string.
-- `hand` (*dict[str, int]*): Mapping of letters to the number of times each letter is available. Each value should be a non‑negative integer.
-- `wordList` (*list[str]*): A list containing lowercase strings representing the allowed vocabulary.
+- `word` (*str*): The candidate word to validate. Expected to be a non‑empty string of lowercase letters.
+- `hand` (*dict[str, int]*): Mapping of letters to the number of times each letter is available. Example: `{'a': 2, 'b': 1}`.
+- `wordList` (*list[str]*): A list containing all permissible lowercase words.
 
-**Returns**: *bool* – `True` if `word` satisfies both conditions; `False` otherwise.
+**Returns**:  
+`bool` – `True` if `word` is in `wordList` **and** can be assembled from `hand`; `False` otherwise.
 
 **Examples**:
 ```python
-# Valid usage
-hand = {'h': 1, 'e': 1, 'l': 2, 'o': 1}
-wordList = ['hello', 'world']
-result = isValidWord('hello', hand, wordList)   # → True
-
-# Word not in wordList
-result = isValidWord('test', hand, wordList)   # → False
-
-# Not enough letters in hand
-hand = {'h': 1, 'e': 1, 'l': 1, 'o': 1}
-result = isValidWord('hello', hand, wordList)  # → False
-
-# Based on observed runtime behavior (invalid `hand` type)
+# Based on observed runtime behavior
+# Example 1 – hand is an int, causing an AttributeError
 result = isValidWord('hello', 0, ['apple', 'banana', 'cherry'])
 # → AttributeError: 'int' object has no attribute 'copy'
 
+# Example 2 – hand is an int, causing an AttributeError
 result = isValidWord('test', 1, ['a', 'b', 'c', 'd', 'e'])
 # → AttributeError: 'int' object has no attribute 'copy'
 
+# Example 3 – empty word, valid hand but returns False
 result = isValidWord('', -1, [])
-# → AttributeError: 'int' object has no attribute 'copy'
+# → AttributeError: 'int' object has no attribute 'copy' (hand is not a dict)
 ```
 
 **Edge Cases / Notes**:
-- An empty string (`word == ''`) is considered invalid and the function returns `False` without checking the hand or word list.
-- The function expects `hand` to be a dictionary; passing any other type (e.g., an integer) triggers an `AttributeError` because the implementation calls `hand.copy()`.
-- The function does **not** modify the original `hand` dictionary; it operates on a shallow copy.
-- All letter counts are decremented on the temporary copy as characters are matched; if a required letter is missing or its count reaches zero, the validation fails.
+- **Non‑dict `hand`**: The function assumes `hand` implements the `.copy()` method. Passing a non‑dictionary (e.g., an `int`) raises `AttributeError: 'int' object has no attribute 'copy'`.
+- **Empty string**: If `word` is `''`, the function immediately returns `False`.
+- **Word not in `wordList`**: Returns `False` without checking the hand.
+- **Insufficient letters**: If any character in `word` is missing from `hand` or appears more times than allowed, the function returns `False`.
+- **Case sensitivity**: The implementation does not alter case; it expects lowercase inputs consistent with `wordList`.

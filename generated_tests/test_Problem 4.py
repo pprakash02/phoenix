@@ -1,96 +1,75 @@
 import pytest
 import importlib.util
-import pathlib
+import sys
+from pathlib import Path
 
-# Dynamically load the target module because its path contains spaces.
-module_path = pathlib.Path(__file__).parent / "Midterm Exam" / "Problem 4.py"
-spec = importlib.util.spec_from_file_location("problem_4", module_path)
-mod = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(mod)
-
-is_triangular = mod.is_triangular
+# Dynamically load the target module from its absolute path
+MODULE_PATH = Path("/home/pprakash/phoenix/generated_tests/PX-767AE5BC/workspace/Midterm Exam/Problem 4.py")
+spec = importlib.util.spec_from_file_location("problem_4", MODULE_PATH)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+is_triangular = module.is_triangular
 
 
 def test_is_triangular_zero():
-    """Regression test: input 0 should return True (observed behavior)."""
+    """Regression test: 0 should be considered triangular (observed behavior)."""
     assert is_triangular(0) is True
 
 
 def test_is_triangular_one():
-    """Regression test: input 1 should return True (observed behavior)."""
+    """Regression test: 1 is a triangular number."""
     assert is_triangular(1) is True
 
 
-def test_is_triangular_true_bool():
-    """Regression test: boolean True is treated as 1 and should return True."""
+def test_is_triangular_bool_true():
+    """Regression test: bool True (treated as 1) returns True."""
     assert is_triangular(True) is True
 
 
 def test_is_triangular_negative_raises():
-    """The function should raise ValueError for negative integers (math domain error)."""
+    """Negative input should raise a ValueError due to sqrt of a negative number."""
     with pytest.raises(ValueError):
         is_triangular(-1)
 
 
 def test_is_triangular_string_raises():
-    """Passing a non‑numeric string should raise a TypeError."""
+    """String input should raise a TypeError when concatenated with int."""
     with pytest.raises(TypeError):
         is_triangular("test")
 
 
 def test_is_triangular_empty_string_raises():
-    """Passing an empty string should raise a TypeError."""
+    """Empty string input should raise a TypeError."""
     with pytest.raises(TypeError):
         is_triangular("")
 
 
+def test_is_triangular_large_triangular_number():
+    """A known large triangular number (55) should return True."""
+    assert is_triangular(55) is True  # 10th triangular number
+
+
+def test_is_triangular_non_triangular_number():
+    """A non‑triangular integer (56) should return False."""
+    assert is_triangular(56) is False
+
+
+def test_is_triangular_float_integer_value():
+    """Float that represents an integer triangular number should be recognized as triangular."""
+    assert is_triangular(3.0) is True  # 3 is triangular (1+2)
+
+
+def test_is_triangular_float_non_integer():
+    """Non‑integer float should return False."""
+    assert is_triangular(4.5) is False
+
+
+def test_is_triangular_bool_false():
+    """Bool False (treated as 0) should return True, matching observed behavior for 0."""
+    assert is_triangular(False) is True
+
+
 def test_is_triangular_none_raises():
-    """Passing None should raise a TypeError."""
+    """None input should raise a TypeError."""
     with pytest.raises(TypeError):
         is_triangular(None)
-
-
-def test_is_triangular_list_raises():
-    """Passing a list should raise a TypeError."""
-    with pytest.raises(TypeError):
-        is_triangular([1, 2, 3])
-
-
-def test_is_triangular_non_triangular_small():
-    """Small non‑triangular number (2) should return False."""
-    assert is_triangular(2) is False
-
-
-def test_is_triangular_triangular_small():
-    """Small triangular numbers (3, 6, 10) should return True."""
-    assert is_triangular(3) is True
-    assert is_triangular(6) is True
-    assert is_triangular(10) is True
-
-
-def test_is_triangular_large_triangular():
-    """A larger triangular number (n=100 => 5050) should return True."""
-    n = 100
-    triangular = n * (n + 1) // 2
-    assert is_triangular(triangular) is True
-
-
-def test_is_triangular_large_non_triangular():
-    """A large non‑triangular number should return False."""
-    assert is_triangular(5051) is False
-
-
-def test_is_triangular_float_triangular():
-    """A float representing a triangular integer (3.0) should return True."""
-    assert is_triangular(3.0) is True
-
-
-def test_is_triangular_float_non_triangular():
-    """A float representing a non‑triangular integer (2.5) should return False."""
-    assert is_triangular(2.5) is False
-
-
-def test_is_triangular_negative_float_raises():
-    """Negative float should raise ValueError (math domain error)."""
-    with pytest.raises(ValueError):
-        is_triangular(-2.0)

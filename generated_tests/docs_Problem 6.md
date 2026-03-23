@@ -1,89 +1,84 @@
 # Module: `Problem 6`
 
-> This module provides two simple, in‑place sorting utilities that demonstrate elementary element‑wise swapping using nested loops. Both functions mutate the supplied list directly, output the list’s state after each swap, and return **`None`**. They are primarily educational examples of quadratic‑time sorting algorithms.
+> This module provides two simple in‑place sorting utilities that operate by repeatedly swapping out‑of‑order elements. Both functions print the list before sorting, after each swap, and finally after sorting completes. They modify the input list directly and do **not** return a value.
 
 ## Functions
 
 ### `swapSort(L)`
 
-**Description**  
-Performs an in‑place sort of `L` by iterating over each element `i` and swapping it with any later element `j` that is smaller. The algorithm is a naïve selection‑sort variant with a time complexity of *O(n²)*.
+**Description**:  
+Implements a basic selection‑sort‑like algorithm. For each index `i` it scans the elements to its right (`j > i`) and swaps whenever it finds a smaller element, progressively moving the smallest remaining value toward the front of the list.
 
-**Parameters**  
-- `L` (*list* of *comparable items*): The list to be sorted. Although the docstring mentions integers, the implementation works with any objects that support the `<` comparison operator (e.g., strings).
+**Parameters**:
+- `L` (*list*): A mutable sequence containing comparable items (e.g., integers, strings). The function expects the items to support the `<` operator.
 
-**Returns**  
-`None`. The list `L` is sorted **in place**; the function does not produce a return value.
+**Returns**:  
+`None`. The list `L` is sorted **in place**; the function’s side‑effects are the printed diagnostics.
 
-**Examples**
+**Examples**:
 ```python
-# Example 1 – integer list
-result = swapSort([1, 2, 3])   # → None
-# Console output:
-# Original L:  [1, 2, 3]
-# Final L:  [1, 2, 3]
-
-# Example 2 – list of strings
+# Example 1 – sorting a list of strings
 result = swapSort(['a', 'b', 'c'])   # → None
 # Console output:
 # Original L:  ['a', 'b', 'c']
 # Final L:  ['a', 'b', 'c']
 
-# Example 3 – single‑element list
-result = swapSort(['test'])   # → None
+# Example 2 – sorting a list of integers
+result = swapSort([1, 2, 3])        # → None
+# Console output:
+# Original L:  [1, 2, 3]
+# Final L:  [1, 2, 3]
+
+# Example 3 – list with a single element
+result = swapSort(['test'])        # → None
 # Console output:
 # Original L:  ['test']
 # Final L:  ['test']
 ```
 
-**Edge Cases / Notes**
-- The function prints the original list, each intermediate state after a swap, and the final sorted list. These side‑effects are useful for tracing but may be undesirable in production code.
-- Because it only compares `L[j] < L[i]` for `j > i`, the algorithm never swaps an element with itself.
-- If the list contains elements that are not mutually comparable (e.g., mixing integers and strings), a `TypeError` will be raised at the comparison step.
+**Edge Cases / Notes**:
+- The function mutates `L`; callers should retain a reference to the original list if the unsorted order is needed later.
+- Although the docstring mentions “list of integers”, any comparable type works (e.g., strings). Passing non‑comparable items will raise a `TypeError`.
+- No value is returned; the only observable result is the printed progress and the mutated list.
 
 ---
 
 ### `modSwapSort(L)`
 
-**Description**  
-A modified version of `swapSort` that iterates over **all** pairs of indices `(i, j)`, including cases where `i == j`. Whenever it finds `L[j] < L[i]`, it swaps the two elements. This also results in a sorted list but performs many redundant comparisons and swaps, still operating in *O(n²)* time.
+**Description**:  
+A variant of `swapSort` where the inner loop iterates over **all** indices (`j` from `0` to `len(L)-1`) instead of only the elements to the right of `i`. This leads to additional (often redundant) swaps but still results in a sorted list after completion.
 
-**Parameters**  
-- `L` (*list* of *comparable items*): The list to be sorted. Like `swapSort`, it works with any elements that support the `<` operator.
+**Parameters**:
+- `L` (*list*): A mutable sequence of comparable items (e.g., integers, strings). Elements must support the `<` operator.
 
-**Returns**  
-`None`. The list `L` is sorted **in place**; no value is returned.
+**Returns**:  
+`None`. The list `L` is sorted **in place**, with diagnostic prints showing each swap.
 
-**Examples**
+**Examples**:
 ```python
-# Example 1 – integer list in reverse order
-result = modSwapSort([3, 2, 1])   # → None
-# Console output (excerpt):
-# Original L:  [3, 2, 1]
-# [2, 3, 1]
-# [1, 3, 2]
-# [1, 2, 3]
-# Final L:  [1, 2, 3]
-
-# Example 2 – list of strings in reverse order
+# Example 1 – sorting a reverse‑ordered list of strings
 result = modSwapSort(['c', 'b', 'a'])   # → None
-# Console output (excerpt):
+# Console output (abridged):
 # Original L:  ['c', 'b', 'a']
-# ['b', 'c', 'a']
-# ['a', 'c', 'b']
-# ['a', 'b', 'c']
+# [ ... intermediate swap prints ... ]
 # Final L:  ['a', 'b', 'c']
 
-# Example 3 – single‑element list
-result = modSwapSort(['test'])   # → None
+# Example 2 – list with a single element
+result = modSwapSort(['test'])         # → None
 # Console output:
 # Original L:  ['test']
 # Final L:  ['test']
+
+# Example 3 – sorting a reverse‑ordered list of integers
+result = modSwapSort([3, 2, 1])        # → None
+# Console output (abridged):
+# Original L:  [3, 2, 1]
+# [ ... intermediate swap prints ... ]
+# Final L:  [1, 2, 3]
 ```
 
-**Edge Cases / Notes**
-- The inner loop runs from `0` to `len(L) - 1` for every `i`, causing unnecessary self‑comparisons (`i == j`). When `i == j`, the condition `L[j] < L[i]` is never true, so no swap occurs, but the extra iterations add overhead.
-- Like `swapSort`, the function prints each intermediate list state, which can be noisy for large inputs.
-- The algorithm assumes that all elements are mutually comparable; otherwise, a `TypeError` will be raised during the `<` comparison.
-
----
+**Edge Cases / Notes**:
+- Like `swapSort`, this function mutates the input list directly.
+- The full‑range inner loop makes the algorithm less efficient (`O(n²)` swaps with many unnecessary operations) compared to `swapSort`.
+- Works with any comparable element type; non‑comparable items will raise a `TypeError`.
+- Returns `None`; only side‑effects (printing and in‑place sorting) are observable.

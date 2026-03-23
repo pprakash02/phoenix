@@ -1,36 +1,36 @@
 # Module: `Problem 4`
 
-> This module provides a single utility function that determines whether a given positive integer (or an integer‑compatible value) is a triangular number. A triangular number *Tₙ* satisfies the formula *Tₙ = n(n+1)/2*. The implementation uses the inverse quadratic formula to test the property.
+> This module provides a utility function for determining whether a given integer (or integer‑compatible value) is a triangular number. A triangular number *Tₙ* can be expressed as *n(n+1)/2* for some positive integer *n*. The implementation uses the inverse triangular‑number formula and checks if the resulting index is an integer.
 
 ## Functions
 
 ### `is_triangular(k)`
 
 **Description**:  
-Evaluates whether the argument `k` corresponds to a triangular number. The function computes  
+Determines whether the argument `k` represents a triangular number. The function computes  
 
 \[
 x = \frac{\sqrt{8k + 1} - 1}{2}
 \]
 
-and returns `True` if `x` is an integer (i.e., `k` can be expressed as *n(n+1)/2* for some integer *n*), otherwise `False`.
+and returns `True` if `x` is an integer (i.e., `k` fits the triangular‑number formula), otherwise `False`.
 
 **Parameters**:
-- `k` (*int* or *bool*): The value to test. Expected to be a non‑negative integer; booleans are accepted because they are subclasses of `int` in Python.
+- `k` (*int or float or bool*): The value to test. The docstring states it should be a positive integer, but the implementation accepts any numeric type that can be used in arithmetic with `math.sqrt`. Non‑numeric arguments will raise a `TypeError`.
 
 **Returns**:  
 `bool` – `True` if `k` is triangular, `False` otherwise.
 
 **Examples**:
 ```python
-# Observed runtime behavior
-result = is_triangular(0)      # → True  (note: 0 is not a standard triangular number)
+# Based on observed runtime behavior
+result = is_triangular(0)      # → True  (0 is treated as triangular by this implementation)
 result = is_triangular(1)      # → True
-result = is_triangular(True)   # → True
+result = is_triangular(True)   # → True  (True is interpreted as 1)
 ```
 
 **Edge Cases / Notes**:
-- **Negative inputs**: `is_triangular(-1)` raises `ValueError: math domain error` because the expression under the square root becomes negative.
-- **Non‑numeric inputs**: Passing a string such as `'test'` or `''` triggers `TypeError: can only concatenate str (not "int") to str`. This arises from the attempt to perform arithmetic with a non‑numeric type.
-- **Zero handling**: The function returns `True` for `k = 0`, even though 0 is not traditionally considered a triangular number. Users may need to add an explicit check if a strict definition is required.
-- **Missing import**: The function relies on `math.sqrt`; ensure `import math` is present in the module before calling the function.
+- The function does **not** validate that `k` is positive. Supplying a negative integer (e.g., `-1`) triggers `math.sqrt` on a negative argument, raising `ValueError: math domain error`.
+- Passing non‑numeric types (e.g., strings) causes a `TypeError` because the expression `8*k + 1` attempts to concatenate a string with an integer.
+- `bool` values are subclasses of `int`; therefore `True` is treated as `1` and returns `True`.
+- Mathematically, the triangular sequence starts at `1` (`T₁ = 1`). The current implementation incorrectly returns `True` for `k = 0`. Users may need to add an explicit check if `0` should be excluded.

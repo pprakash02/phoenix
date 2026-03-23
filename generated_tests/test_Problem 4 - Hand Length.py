@@ -1,85 +1,80 @@
 import pytest
 import importlib.util
-import pathlib
+import os
 
-# Dynamically load the target module because its filename contains spaces and hyphens
-_module_path = pathlib.Path(
-    "/home/pprakash/phoenix/generated_tests/PX-714DB47F/workspace/Problem Set 4/Problem 4 - Hand Length.py"
-)
-_spec = importlib.util.spec_from_file_location("hand_length_module", _module_path)
-_hand_length_module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_hand_length_module)
+# Load the target module from its absolute path
+MODULE_PATH = "/home/pprakash/phoenix/generated_tests/PX-6DC06898/workspace/Problem Set 4/Problem 4 - Hand Length.py"
+MODULE_NAME = "hand_length_module"
 
-# Export the function to be tested
-calculateHandlen = _hand_length_module.calculateHandlen
+spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
+hand_length_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(hand_length_mod)
+
+calculateHandlen = hand_length_mod.calculateHandlen
 
 
-def test_calculateHandlen_basic():
-    """
-    Verify that calculateHandlen correctly sums the counts of a typical hand dictionary.
-    """
+def test_calculateHandlen_basic_dictionary():
+    """Verify that a typical hand dictionary sums correctly."""
     hand = {"a": 1, "b": 2, "c": 3}
     assert calculateHandlen(hand) == 6
 
 
-def test_calculateHandlen_empty_hand():
-    """
-    An empty hand should have length 0.
-    """
-    assert calculateHandlen({}) == 0
-
-
-def test_calculateHandlen_zero_counts():
-    """
-    Hand entries with a count of zero should not affect the total length.
-    """
-    hand = {"a": 0, "b": 0}
+def test_calculateHandlen_empty_dictionary():
+    """An empty hand should have length 0."""
+    hand = {}
     assert calculateHandlen(hand) == 0
 
 
+def test_calculateHandlen_zero_counts():
+    """Letters with a count of zero should not affect the total length."""
+    hand = {"x": 0, "y": 0}
+    assert calculateHandlen(hand) == 0
+
+
+def test_calculateHandlen_large_counts():
+    """Large integer counts should be summed without overflow."""
+    hand = {"m": 1000, "n": 2000, "o": 3000}
+    assert calculateHandlen(hand) == 6000
+
+
 def test_calculateHandlen_negative_counts():
-    """
-    Negative counts are summed as‑is; this test ensures the function does not raise
-    and returns the arithmetic sum.
-    """
-    hand = {"a": -2, "b": 3}
+    """Negative counts are summed as given (function does not guard against them)."""
+    hand = {"p": -1, "q": 2}
     assert calculateHandlen(hand) == 1
 
 
-def test_calculateHandlen_non_string_keys():
-    """
-    Keys do not need to be strings; the function only sums the values.
-    """
-    hand = {1: 2, "b": 3}
-    assert calculateHandlen(hand) == 5
-
-
-def test_calculateHandlen_large_numbers():
-    """
-    Verify handling of large integer counts.
-    """
-    hand = {"x": 1_000_000, "y": 2_000_000}
-    assert calculateHandlen(hand) == 3_000_000
-
-
-@pytest.mark.parametrize(
-    "invalid_input",
-    [
-        0,
-        1,
-        -1,
-        10,
-        100,
-        0.5,
-        None,
-        [("a", 1), ("b", 2)],
-        "not a dict",
-    ],
-)
-def test_calculateHandlen_invalid_input_raises_typeerror(invalid_input):
-    """
-    Passing a non‑dictionary (including numbers, None, list, and string) should raise TypeError
-    because the function attempts to iterate over the object.
-    """
+def test_calculateHandlen_non_integer_values():
+    """Non‑integer values for counts should raise a TypeError during addition."""
+    hand = {"r": "2", "s": 3}
     with pytest.raises(TypeError):
-        calculateHandlen(invalid_input)
+        calculateHandlen(hand)
+
+
+def test_calculateHandlen_input_is_int():
+    """Passing an int instead of a dict should raise TypeError (not iterable)."""
+    with pytest.raises(TypeError):
+        calculateHandlen(5)
+
+
+def test_calculateHandlen_input_is_float():
+    """Passing a float instead of a dict should raise TypeError (not iterable)."""
+    with pytest.raises(TypeError):
+        calculateHandlen(3.14)
+
+
+def test_calculateHandlen_input_is_list():
+    """Passing a list instead of a dict should raise TypeError (cannot index with strings)."""
+    with pytest.raises(TypeError):
+        calculateHandlen([1, 2, 3])
+
+
+def test_calculateHandlen_input_is_string():
+    """Passing a string instead of a dict should raise TypeError (cannot index with strings)."""
+    with pytest.raises(TypeError):
+        calculateHandlen("abc")
+
+
+def test_calculateHandlen_input_is_none():
+    """Passing None should raise TypeError (not iterable)."""
+    with pytest.raises(TypeError):
+        calculateHandlen(None)

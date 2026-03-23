@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getResults, approveTests, rejectTests } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
+import SetupProgress from '../components/SetupProgress';
 import './ReviewPage.css';
 
 function ReviewPage({ sessionData }) {
@@ -11,7 +12,7 @@ function ReviewPage({ sessionData }) {
   const { pipelineResult } = useSocket(sessionId);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(null);
+  const [expandedFile, setExpandedFile] = useState(null);
   const [showReject, setShowReject] = useState(false);
   const [rejectComments, setRejectComments] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
@@ -20,14 +21,10 @@ function ReviewPage({ sessionData }) {
     if (pipelineResult) {
       setResults(pipelineResult);
       setLoading(false);
-      const firstFile = Object.keys(pipelineResult.test_files || {})[0];
-      if (firstFile) setActiveTab(firstFile);
     } else if (sessionId) {
       getResults(sessionId)
         .then((data) => {
           setResults(data);
-          const firstFile = Object.keys(data.test_files || {})[0];
-          if (firstFile) setActiveTab(firstFile);
         })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -64,12 +61,15 @@ function ReviewPage({ sessionData }) {
   if (!sessionId) {
     return (
       <div className="review-page animate-fade-in">
-        <div className="container">
-          <div className="empty-state">
-            <span className="empty-icon">📋</span>
-            <h2>No Results to Review</h2>
-            <p>Run a pipeline first to generate test suites.</p>
-            <button className="btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+        <div className="page-two-col">
+          <div className="page-left"><SetupProgress currentStep={2} /></div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <span className="empty-icon">📋</span>
+              <h2>No Results to Review</h2>
+              <p>Run a pipeline first to generate test suites.</p>
+              <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+            </div>
           </div>
         </div>
       </div>
@@ -79,10 +79,13 @@ function ReviewPage({ sessionData }) {
   if (loading) {
     return (
       <div className="review-page animate-fade-in">
-        <div className="container">
-          <div className="loading-state">
-            <span className="spinner large" />
-            <p>Loading results...</p>
+        <div className="page-two-col">
+          <div className="page-left"><SetupProgress currentStep={2} /></div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <span className="spinner large" />
+              <p>Loading results...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -92,127 +95,160 @@ function ReviewPage({ sessionData }) {
   const testFiles = results?.test_files || {};
   const docFiles = results?.doc_files || {};
   const conversationLog = results?.conversation_log || [];
+  const allFiles = [
+    ...Object.entries(testFiles).map(([name, content]) => ({ name, content, type: 'test' })),
+    ...Object.entries(docFiles).map(([name, content]) => ({ name, content, type: 'doc' })),
+  ];
 
   return (
     <div className="review-page animate-fade-in">
-      <div className="container-wide">
-        <div className="page-header">
-          <span className="page-subtitle">QUALITY REVIEW</span>
-          <h1 className="page-title">Review Generated Tests</h1>
-          <p className="page-desc">
+      <div className="page-two-col">
+        {/* ─── Left Sidebar ─── */}
+        <div className="page-left">
+          <div className="sidebar-badge">
+            <span className="badge-dot" />
+            Quality Review
+          </div>
+          <h1 className="sidebar-title">Review<br /><span>Generated Tests</span></h1>
+          <p className="sidebar-description">
             Review the auto-generated test suites and documentation before approval.
           </p>
+
+          <div className="review-stats-sidebar">
+            <div className="mini-stat">
+              <span className="mini-stat-value">{Object.keys(testFiles).length}</span>
+              <span className="mini-stat-label">Test Files</span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-value">{Object.keys(docFiles).length}</span>
+              <span className="mini-stat-label">Doc Files</span>
+            </div>
+            <div className="mini-stat accent">
+              <span className="mini-stat-value">{conversationLog.length}</span>
+              <span className="mini-stat-label">Messages</span>
+            </div>
+          </div>
+
+          <SetupProgress currentStep={2} />
         </div>
 
-        <div className="review-stats">
-          <div className="stat-card">
-            <span className="stat-value">{Object.keys(testFiles).length}</span>
-            <span className="stat-label">Test Files</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-value">{Object.keys(docFiles).length}</span>
-            <span className="stat-label">Doc Files</span>
-          </div>
-          <div className="stat-card accent">
-            <span className="stat-value">{conversationLog.length}</span>
-            <span className="stat-label">Agent Messages</span>
-          </div>
-        </div>
+        {/* ─── Right Panel ─── */}
+        <div className="page-right">
+          <div className="panel-card">
+            <h2 className="panel-section-title">Generated Files</h2>
+            <p className="panel-section-desc">Click on a file to expand and review its content.</p>
 
-        {/* Test File Tabs */}
-        <div className="code-viewer">
-          <div className="code-tabs">
-            {Object.keys(testFiles).map((fname) => (
-              <button
-                key={fname}
-                className={`code-tab ${activeTab === fname ? 'active' : ''}`}
-                onClick={() => setActiveTab(fname)}
-              >
-                🧪 {fname}
-              </button>
-            ))}
-            {Object.keys(docFiles).map((fname) => (
-              <button
-                key={fname}
-                className={`code-tab ${activeTab === fname ? 'active' : ''}`}
-                onClick={() => setActiveTab(fname)}
-              >
-                📄 {fname}
-              </button>
-            ))}
-          </div>
-
-          <div className="code-content">
-            {activeTab && docFiles[activeTab] ? (
-              <div className="markdown-content">
-                <ReactMarkdown>{docFiles[activeTab]}</ReactMarkdown>
-              </div>
-            ) : (
-              <pre><code>{testFiles[activeTab] || 'Select a file to view'}</code></pre>
-            )}
-          </div>
-        </div>
-
-        {/* Agent Conversation Log */}
-        {conversationLog.length > 0 && (
-          <div className="conversation-section">
-            <h3>🤖 Agent Conversation</h3>
-            <div className="conversation-log">
-              {conversationLog.map((msg, idx) => (
-                <div key={idx} className={`conversation-msg ${msg.author.toLowerCase()}`}>
-                  <div className="msg-header">
-                    <span className="msg-author">{msg.author}</span>
+            {/* Expandable File Cards */}
+            <div className="review-file-list">
+              {allFiles.map((file, index) => (
+                <div
+                  key={file.name}
+                  className={`review-file-card animate-slide-up ${expandedFile === file.name ? 'expanded' : ''}`}
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
+                  <div
+                    className="review-file-header"
+                    onClick={() => setExpandedFile(expandedFile === file.name ? null : file.name)}
+                  >
+                    <div className="review-file-info">
+                      <span className="review-file-icon">{file.type === 'test' ? '🧪' : '📄'}</span>
+                      <div>
+                        <span className="review-file-name">{file.name}</span>
+                        <span className="review-file-meta">
+                          {file.content.split('\n').length} lines · {(file.content.length / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    </div>
+                    <div className="review-file-right">
+                      <span className={`ph-chip ${file.type === 'test' ? 'purple' : 'green'}`}>
+                        {file.type === 'test' ? 'TEST' : 'DOCS'}
+                      </span>
+                      <span className="expand-icon">{expandedFile === file.name ? '▲' : '▼'}</span>
+                    </div>
                   </div>
-                  <div className="msg-content">
-                    <pre>{msg.content.slice(0, 500)}{msg.content.length > 500 ? '...' : ''}</pre>
-                  </div>
+
+                  {expandedFile === file.name && (
+                    <div className="review-file-body">
+                      {file.type === 'doc' ? (
+                        <div className="markdown-content">
+                          <ReactMarkdown>{file.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <pre className="code-block"><code>{file.content}</code></pre>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* Reject Modal */}
-        {showReject && (
-          <div className="reject-modal-overlay" onClick={() => setShowReject(false)}>
-            <div className="reject-modal" onClick={(e) => e.stopPropagation()}>
-              <h3>📝 Rejection Comments</h3>
-              <p>Describe what needs improvement. The pipeline will re-run with your feedback.</p>
-              <textarea
-                className="form-textarea"
-                placeholder="e.g., Missing edge cases for empty lists, need boundary tests for negative inputs..."
-                value={rejectComments}
-                onChange={(e) => setRejectComments(e.target.value)}
-                rows={4}
-              />
-              <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setShowReject(false)}>Cancel</button>
-                <button className="btn-danger" onClick={handleReject} disabled={actionLoading}>
-                  {actionLoading ? <span className="spinner" /> : 'Submit & Re-run'}
-                </button>
+            {/* Agent Conversation Log */}
+            {conversationLog.length > 0 && (
+              <div className="conversation-section">
+                <h3>🤖 Agent Conversation</h3>
+                <div className="conversation-log">
+                  {conversationLog.slice(0, 20).map((msg, idx) => (
+                    <div key={idx} className={`conversation-msg ${msg.author.toLowerCase()}`}>
+                      <div className="msg-header">
+                        <span className="msg-author">{msg.author}</span>
+                      </div>
+                      <div className="msg-content">
+                        <pre>{msg.content.slice(0, 300)}{msg.content.length > 300 ? '...' : ''}</pre>
+                      </div>
+                    </div>
+                  ))}
+                  {conversationLog.length > 20 && (
+                    <div className="msg-overflow">
+                      + {conversationLog.length - 20} more messages
+                    </div>
+                  )}
+                </div>
               </div>
+            )}
+
+            {/* Approval Actions */}
+            <div className="panel-footer review-footer">
+              <button
+                className="ph-btn-outline-danger"
+                onClick={() => setShowReject(true)}
+                disabled={actionLoading}
+              >
+                ✗ Reject with Comments
+              </button>
+              <button
+                className="ph-btn-primary"
+                onClick={handleApprove}
+                disabled={actionLoading}
+              >
+                {actionLoading ? <span className="spinner" /> : '✓ Approve & Continue'}
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Approval Actions */}
-        <div className="review-actions">
-          <button
-            className="btn-reject"
-            onClick={() => setShowReject(true)}
-            disabled={actionLoading}
-          >
-            ✗ Reject with Comments
-          </button>
-          <button
-            className="btn-approve"
-            onClick={handleApprove}
-            disabled={actionLoading}
-          >
-            {actionLoading ? <span className="spinner" /> : '✓ Approve & Continue'}
-          </button>
         </div>
       </div>
+
+      {/* Reject Modal */}
+      {showReject && (
+        <div className="modal-overlay" onClick={() => setShowReject(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>📝 Rejection Comments</h3>
+            <p>Describe what needs improvement. The pipeline will re-run with your feedback.</p>
+            <textarea
+              className="ph-textarea"
+              placeholder="e.g., Missing edge cases for empty lists, need boundary tests for negative inputs..."
+              value={rejectComments}
+              onChange={(e) => setRejectComments(e.target.value)}
+              rows={4}
+            />
+            <div className="modal-actions">
+              <button className="ph-btn-ghost" onClick={() => setShowReject(false)}>Cancel</button>
+              <button className="ph-btn-danger" onClick={handleReject} disabled={actionLoading}>
+                {actionLoading ? <span className="spinner" /> : 'Submit & Re-run'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

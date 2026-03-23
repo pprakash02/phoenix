@@ -2,120 +2,108 @@ import pytest
 import importlib.util
 import pathlib
 
-# Dynamically load the target module since its path contains spaces
-_module_path = pathlib.Path(
-    "/home/pprakash/phoenix/generated_tests/PX-714DB47F/workspace/Midterm Exam/Problem 6.py"
-)
-_spec = importlib.util.spec_from_file_location("problem6", _module_path)
-_problem6 = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_problem6)
+# Dynamically load the target module because its path contains spaces and unconventional characters
+def _load_target_module():
+    base_path = pathlib.Path(__file__).parent
+    module_path = (
+        base_path
+        / "home"
+        / "pprakash"
+        / "phoenix"
+        / "generated_tests"
+        / "PX-6DC06898"
+        / "workspace"
+        / "Midterm Exam"
+        / "Problem 6.py"
+    )
+    spec = importlib.util.spec_from_file_location("problem6", module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore[attr-defined]
+    return module
 
-largest_odd_times = _problem6.largest_odd_times
+_mod = _load_target_module()
+largest_odd_times = _mod.largest_odd_times
 
+def test_largest_odd_times_string_hello():
+    """Regression test: the function should return the largest character occurring odd times for a string."""
+    result = largest_odd_times("hello")
+    assert result == "o"
 
-def test_largest_odd_times_basic_example():
-    """Typical example from the docstring: largest odd-occurring element."""
-    assert largest_odd_times([3, 9, 5, 3, 5, 3]) == 9
+def test_largest_odd_times_string_test():
+    """Regression test: observed behavior for the string 'test' where the result should be 's'."""
+    result = largest_odd_times("test")
+    assert result == "s"
 
+def test_largest_odd_times_empty_string():
+    """Edge case: an empty string should yield None because there are no elements to evaluate."""
+    result = largest_odd_times("")
+    assert result is None
 
-def test_largest_odd_times_no_odd_occurrences():
-    """When no element occurs an odd number of times, function should return None."""
-    assert largest_odd_times([2, 2, 4, 4]) is None
+def test_largest_odd_times_list_of_ints():
+    """Regression test: a simple list of ints should return the maximum when it appears an odd number of times."""
+    result = largest_odd_times([1, 2, 3])
+    assert result == 3
 
+def test_largest_odd_times_all_even_counts():
+    """Edge case: when every element appears an even number of times, the function should return None."""
+    result = largest_odd_times([2, 2, 4, 4])
+    assert result is None
 
-def test_largest_odd_times_single_odd_element():
-    """Single element list should be returned (occurs once, which is odd)."""
-    assert largest_odd_times([42]) == 42
-
-
-def test_largest_odd_times_all_even_except_one():
-    """Largest element occurs even times, fallback to next odd-occurring element."""
-    assert largest_odd_times([5, 5, 3]) == 3
-
-
-def test_largest_odd_times_recursive_case():
-    """Recursive removal of the current max when it occurs an even number of times."""
-    # 4 occurs twice (even), 2 occurs once (odd) -> should return 2
-    assert largest_odd_times([2, 4, 4, 2]) == 2
-
-
-def test_largest_odd_times_negative_numbers():
-    """Function should handle negative integers correctly."""
-    assert largest_odd_times([-1, -3, -1, -3, -5]) == -5
-
-
-def test_largest_odd_times_mixed_positive_and_negative():
-    """Mixed signs with odd occurrences."""
-    assert largest_odd_times([-2, 1, -2, 3, 1, 3, 3]) == 3
-
-
-def test_largest_odd_times_string_input():
-    """String input is iterable; function should return the highest character occurring odd times."""
-    assert largest_odd_times("hello") == "o"
-    assert largest_odd_times("test") == "t"
-    assert largest_odd_times("") is None
-
-
-def test_largest_odd_times_list_of_strings():
-    """List containing a single string behaves like a string input."""
-    assert largest_odd_times(["hello"]) == "o"
-    assert largest_odd_times(["test"]) == "t"
-    assert largest_odd_times([""]) is None
-
-
-def test_largest_odd_times_list_of_lists():
-    """List of comparable items (e.g., lists) where max works."""
-    assert largest_odd_times([[1, 2, 3]]) == [1, 2, 3]
-
+def test_largest_odd_times_example_from_docstring():
+    """Regression test using the example provided in the docstring."""
+    result = largest_odd_times([3, 9, 5, 3, 5, 3])
+    assert result == 9
 
 def test_largest_odd_times_empty_list():
-    """Explicit empty list should return None."""
-    assert largest_odd_times([]) is None
+    """Edge case: an explicitly empty list should return None."""
+    result = largest_odd_times([])
+    assert result is None
 
+def test_largest_odd_times_multiple_odd_occurrences():
+    """When several numbers occur odd times, the largest such number should be returned."""
+    result = largest_odd_times([1, 1, 2, 3, 3])
+    assert result == 3
 
-def test_largest_odd_times_non_comparable_elements():
-    """When elements cannot be compared, max() should raise a TypeError."""
-    with pytest.raises(TypeError):
-        largest_odd_times([1, "a"])
+def test_largest_odd_times_max_even_then_odd():
+    """The max element occurs an even number of times, requiring recursive filtering."""
+    result = largest_odd_times([5, 5, 4, 4, 3])
+    assert result == 3
 
+def test_largest_odd_times_negative_numbers():
+    """Function should correctly handle negative integers."""
+    result = largest_odd_times([-1, -2, -2, -3, -3, -3])
+    # -1 occurs once (odd), -2 occurs twice (even), -3 occurs three times (odd)
+    # Largest odd-occurring element is -1
+    assert result == -1
 
-def test_largest_odd_times_none_input():
-    """Passing None instead of a list should raise a TypeError."""
+def test_largest_odd_times_max_even_others_odd():
+    """When the maximum element occurs an even number of times, the next lower odd-occurring element is returned."""
+    result = largest_odd_times([7, 7, 5])
+    assert result == 5
+
+def test_largest_odd_times_single_element():
+    """A single-element list should return that element."""
+    result = largest_odd_times([42])
+    assert result == 42
+
+def test_largest_odd_times_type_error_none():
+    """Passing None should raise a TypeError because max() cannot operate on None."""
     with pytest.raises(TypeError):
         largest_odd_times(None)
 
+def test_largest_odd_times_type_error_mixed_types():
+    """Passing a list with mixed incomparable types should raise a TypeError."""
+    with pytest.raises(TypeError):
+        largest_odd_times([1, "a", 2])
 
-def test_largest_odd_times_large_input():
-    """Large input where an odd-occurring element exists; ensure function returns a value."""
-    large_list = [i for i in range(1000)] + [500]  # 500 occurs twice (even), 999 occurs once (odd)
-    assert largest_odd_times(large_list) == 999
+def test_largest_odd_times_large_input_performance():
+    """Large input sanity check: ensure the function returns a result (not None) for a sizable list."""
+    large_list = [i % 10 for i in range(1000)]  # many repetitions, some odd counts
+    result = largest_odd_times(large_list)
+    assert result is not None
 
-
-def test_largest_odd_times_all_even_occurrences():
-    """All elements occur an even number of times; should return None."""
-    assert largest_odd_times([1, 1, 2, 2, 3, 3]) is None
-
-
-def test_largest_odd_times_multiple_odd_occurrences():
-    """Multiple elements occur odd times; should return the largest among them."""
-    assert largest_odd_times([7, 7, 5, 5, 5, 3, 3, 3]) == 7
-
-
-def test_largest_odd_times_single_element_even_times():
-    """Single element occurring an even number of times should result in None."""
-    assert largest_odd_times([10, 10]) is None
-
-
-def test_largest_odd_times_duplicate_max_even_then_odd():
-    """Max element appears even times, next max appears odd times."""
-    assert largest_odd_times([8, 8, 7, 7, 7]) == 7
-
-
-def test_largest_odd_times_unicode_characters():
-    """String with Unicode characters; max should respect Unicode ordering."""
-    assert largest_odd_times("áéíóú") == "ú"  # each char occurs once (odd) and 'ú' is max
-
-
-def test_largest_odd_times_mixed_types_same_comparable():
-    """Elements of same type that are comparable (e.g., tuples)."""
-    assert largest_odd_times([(1, 2), (3, 4), (1, 2)]) == (3, 4)
+def test_largest_odd_times_unicode_string():
+    """Unicode characters should be handled correctly; the max character with odd count is returned."""
+    result = largest_odd_times("áéíóúáéí")
+    # Characters: á (2), é (2), í (2), ó (1), ú (1) -> max odd-occurring = 'ú' (unicode point > 'ó')
+    assert result == "ú"

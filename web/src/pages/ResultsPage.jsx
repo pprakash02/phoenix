@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getResults, getDownloadUrl, createPR } from '../services/api';
+import SetupProgress from '../components/SetupProgress';
 import './ResultsPage.css';
 
 function ResultsPage({ sessionData }) {
@@ -9,7 +10,7 @@ function ResultsPage({ sessionData }) {
   const sessionId = sessionData?.session_id;
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(null);
+  const [expandedFile, setExpandedFile] = useState(null);
   const [showPR, setShowPR] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [branchName, setBranchName] = useState('');
@@ -22,9 +23,6 @@ function ResultsPage({ sessionData }) {
       getResults(sessionId)
         .then((data) => {
           setResults(data);
-          const firstDoc = Object.keys(data.doc_files || {})[0];
-          const firstTest = Object.keys(data.test_files || {})[0];
-          setActiveTab(firstDoc || firstTest || null);
           setBranchName(`phoenix/test-suite-${sessionId}`);
         })
         .catch(() => {})
@@ -54,12 +52,15 @@ function ResultsPage({ sessionData }) {
   if (!sessionId) {
     return (
       <div className="results-page animate-fade-in">
-        <div className="container">
-          <div className="empty-state">
-            <span className="empty-icon">📊</span>
-            <h2>No Results Available</h2>
-            <p>Complete a pipeline run to see results here.</p>
-            <button className="btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+        <div className="page-two-col">
+          <div className="page-left"><SetupProgress currentStep={3} /></div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <span className="empty-icon">📊</span>
+              <h2>No Results Available</h2>
+              <p>Complete a pipeline run to see results here.</p>
+              <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+            </div>
           </div>
         </div>
       </div>
@@ -69,10 +70,13 @@ function ResultsPage({ sessionData }) {
   if (loading) {
     return (
       <div className="results-page animate-fade-in">
-        <div className="container">
-          <div className="loading-state">
-            <span className="spinner large" />
-            <p>Loading results...</p>
+        <div className="page-two-col">
+          <div className="page-left"><SetupProgress currentStep={3} /></div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <span className="spinner large" />
+              <p>Loading results...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -81,152 +85,180 @@ function ResultsPage({ sessionData }) {
 
   const testFiles = results?.test_files || {};
   const docFiles = results?.doc_files || {};
+  const allFiles = [
+    ...Object.entries(docFiles).map(([name, content]) => ({ name, content, type: 'doc' })),
+    ...Object.entries(testFiles).map(([name, content]) => ({ name, content, type: 'test' })),
+  ];
 
   return (
     <div className="results-page animate-fade-in">
-      <div className="container-wide">
-        <div className="page-header">
-          <span className="page-subtitle">PIPELINE RESULTS</span>
-          <h1 className="page-title">Generated Artifacts</h1>
-          <p className="page-desc">
+      <div className="page-two-col">
+        {/* ─── Left Sidebar ─── */}
+        <div className="page-left">
+          <div className="sidebar-badge">
+            <span className="badge-dot success" />
+            Complete
+          </div>
+          <h1 className="sidebar-title">Generated<br /><span>Artifacts</span></h1>
+          <p className="sidebar-description">
             Test suites and documentation ready for deployment.
           </p>
+
+          <div className="results-stats-sidebar">
+            <div className="result-stat-card success">
+              <div className="result-stat-icon">✅</div>
+              <div>
+                <span className="result-stat-title">Tests Generated</span>
+                <span className="result-stat-value">{Object.keys(testFiles).length} test files</span>
+              </div>
+            </div>
+            <div className="result-stat-card info">
+              <div className="result-stat-icon">📄</div>
+              <div>
+                <span className="result-stat-title">Documentation</span>
+                <span className="result-stat-value">{Object.keys(docFiles).length} doc files</span>
+              </div>
+            </div>
+            <div className="result-stat-card accent">
+              <div className="result-stat-icon">🔥</div>
+              <div>
+                <span className="result-stat-title">Status</span>
+                <span className="ph-chip green">PHOENIX APPROVED</span>
+              </div>
+            </div>
+          </div>
+
+          <SetupProgress currentStep={3} />
         </div>
 
-        {/* Summary Cards */}
-        <div className="results-summary">
-          <div className="summary-card success">
-            <div className="summary-icon">✅</div>
-            <div className="summary-content">
-              <span className="summary-title">Tests Generated</span>
-              <span className="summary-value">{Object.keys(testFiles).length} test files</span>
+        {/* ─── Right Panel ─── */}
+        <div className="page-right">
+          <div className="panel-card">
+            <h2 className="panel-section-title">All Artifacts</h2>
+            <p className="panel-section-desc">
+              {allFiles.length} files generated. Click to expand and review.
+            </p>
+
+            {/* Expandable File Cards */}
+            <div className="results-file-list">
+              {allFiles.map((file, index) => (
+                <div
+                  key={file.name}
+                  className={`results-file-card animate-slide-up ${expandedFile === file.name ? 'expanded' : ''}`}
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
+                  <div
+                    className="results-file-header"
+                    onClick={() => setExpandedFile(expandedFile === file.name ? null : file.name)}
+                  >
+                    <div className="results-file-info">
+                      <span className="results-file-icon">{file.type === 'test' ? '🧪' : '📄'}</span>
+                      <div>
+                        <span className="results-file-name">{file.name}</span>
+                        <span className="results-file-meta">
+                          {file.content.split('\n').length} lines · {(file.content.length / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    </div>
+                    <div className="results-file-right">
+                      <span className={`ph-chip ${file.type === 'test' ? 'purple' : 'green'}`}>
+                        {file.type === 'test' ? 'TEST' : 'DOCS'}
+                      </span>
+                      <span className="expand-icon">{expandedFile === file.name ? '▲' : '▼'}</span>
+                    </div>
+                  </div>
+
+                  {expandedFile === file.name && (
+                    <div className="results-file-body">
+                      {file.type === 'doc' ? (
+                        <div className="markdown-content">
+                          <ReactMarkdown>{file.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <pre className="code-block"><code>{file.content}</code></pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="summary-card info">
-            <div className="summary-icon">📄</div>
-            <div className="summary-content">
-              <span className="summary-title">Documentation</span>
-              <span className="summary-value">{Object.keys(docFiles).length} doc files</span>
-            </div>
-          </div>
-          <div className="summary-card neutral">
-            <div className="summary-icon">🔥</div>
-            <div className="summary-content">
-              <span className="summary-title">Status</span>
-              <span className="summary-value chip chip-green">PHOENIX APPROVED</span>
+
+            {/* Actions */}
+            <div className="panel-footer">
+              <button className="ph-btn-ghost" onClick={() => navigate('/')}>
+                ← Start New Project
+              </button>
+              <div className="footer-actions-right">
+                <a
+                  href={getDownloadUrl(sessionId)}
+                  className="ph-btn-primary download-link"
+                  download
+                >
+                  ⬇ Download All
+                </a>
+                <button className="ph-btn-primary pr-btn" onClick={() => setShowPR(true)}>
+                  🔀 Create Pull Request
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* File Viewer */}
-        <div className="code-viewer">
-          <div className="code-tabs">
-            {Object.keys(docFiles).map((fname) => (
-              <button
-                key={fname}
-                className={`code-tab ${activeTab === fname ? 'active' : ''}`}
-                onClick={() => setActiveTab(fname)}
-              >
-                📄 {fname}
-              </button>
-            ))}
-            {Object.keys(testFiles).map((fname) => (
-              <button
-                key={fname}
-                className={`code-tab ${activeTab === fname ? 'active' : ''}`}
-                onClick={() => setActiveTab(fname)}
-              >
-                🧪 {fname}
-              </button>
-            ))}
-          </div>
-          <div className="code-content">
-            {activeTab && docFiles[activeTab] ? (
-              <div className="markdown-content">
-                <ReactMarkdown>{docFiles[activeTab]}</ReactMarkdown>
+      {/* PR Creation Modal */}
+      {showPR && (
+        <div className="modal-overlay" onClick={() => setShowPR(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>🔀 Create Pull Request</h3>
+            <p>Push the generated test suite and documentation to a new branch on your repository.</p>
+
+            {prResult ? (
+              <div className="pr-success">
+                <span className="pr-success-icon">🎉</span>
+                <p>Pull Request created successfully!</p>
+                <a href={prResult.url} target="_blank" rel="noopener noreferrer" className="pr-link">
+                  View PR #{prResult.number} →
+                </a>
               </div>
             ) : (
-              <pre><code>{testFiles[activeTab] || 'Select a file to view'}</code></pre>
+              <>
+                {prError && (
+                  <div className="ph-error">{prError}</div>
+                )}
+
+                <div className="modal-field">
+                  <label>GitHub Personal Access Token</label>
+                  <input
+                    type="password"
+                    className="ph-input"
+                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                    value={githubToken}
+                    onChange={(e) => setGithubToken(e.target.value)}
+                  />
+                  <span className="ph-hint">Needs 'repo' scope. Token is not stored.</span>
+                </div>
+
+                <div className="modal-field">
+                  <label>Branch Name</label>
+                  <input
+                    type="text"
+                    className="ph-input"
+                    value={branchName}
+                    onChange={(e) => setBranchName(e.target.value)}
+                  />
+                </div>
+
+                <div className="modal-actions">
+                  <button className="ph-btn-ghost" onClick={() => setShowPR(false)}>Cancel</button>
+                  <button className="ph-btn-primary" onClick={handleCreatePR} disabled={prLoading}>
+                    {prLoading ? <span className="spinner" /> : 'Create PR'}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="results-actions">
-          <a
-            href={getDownloadUrl(sessionId)}
-            className="btn-primary download-btn"
-            download
-          >
-            ⬇ Download All Artifacts
-          </a>
-          <button className="btn-primary pr-btn" onClick={() => setShowPR(true)}>
-            🔀 Create Pull Request
-          </button>
-        </div>
-
-        {/* PR Creation Modal */}
-        {showPR && (
-          <div className="reject-modal-overlay" onClick={() => setShowPR(false)}>
-            <div className="reject-modal pr-modal" onClick={(e) => e.stopPropagation()}>
-              <h3>🔀 Create Pull Request</h3>
-              <p>Push the generated test suite and documentation to a new branch on your repository.</p>
-
-              {prResult ? (
-                <div className="pr-success">
-                  <span className="pr-success-icon">🎉</span>
-                  <p>Pull Request created successfully!</p>
-                  <a href={prResult.url} target="_blank" rel="noopener noreferrer" className="pr-link">
-                    View PR #{prResult.number} →
-                  </a>
-                </div>
-              ) : (
-                <>
-                  {prError && (
-                    <div className="form-error">{prError}</div>
-                  )}
-
-                  <div className="form-section">
-                    <label className="form-label">GitHub Personal Access Token</label>
-                    <input
-                      type="password"
-                      className="form-input"
-                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                      value={githubToken}
-                      onChange={(e) => setGithubToken(e.target.value)}
-                    />
-                    <p className="form-help">Needs 'repo' scope. Token is not stored.</p>
-                  </div>
-
-                  <div className="form-section">
-                    <label className="form-label">Branch Name</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={branchName}
-                      onChange={(e) => setBranchName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="modal-actions">
-                    <button className="btn-secondary" onClick={() => setShowPR(false)}>Cancel</button>
-                    <button className="btn-primary" onClick={handleCreatePR} disabled={prLoading}>
-                      {prLoading ? <span className="spinner" /> : 'Create PR'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* New Project */}
-        <div className="new-project-section">
-          <button className="btn-secondary" onClick={() => navigate('/')}>
-            ← Start New Project
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

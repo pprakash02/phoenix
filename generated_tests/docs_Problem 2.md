@@ -1,17 +1,19 @@
 # Module: `Problem 2`
 
-> This module defines a single utility function that always returns the integer `3`, irrespective of the argument supplied. It can be used wherever a constant value of `3` is required without performing any computation on the input.
+> This module defines a single utility function that returns a constant integer value. The implementation does not depend on the input argument, making the function behave identically for any provided value.
 
 ## Functions
 
 ### `f(x)`
 
-**Description**: Returns the constant integer `3` for any provided argument. The input is ignored, making the function effectively a constant generator.
+**Description**:  
+Returns the integer `3` irrespective of the argument supplied. The function ignores its parameter and always produces the same constant output.
 
 **Parameters**:
-- `x` (*Any*): The value passed to the function. Its type is not used in the computation; examples include integers, strings, or any other Python object.
+- `x` (*Any*): The input value is accepted but not used in any computation. It can be of any type (e.g., `int`, `float`, `str`, etc.).
 
-**Returns**: `int` – always the value `3`.
+**Returns**:  
+`int` – the constant value `3`.
 
 **Examples**:
 ```python
@@ -24,4 +26,5 @@ result = f('')       # → 3
 ```
 
 **Edge Cases / Notes**:
-- The function does not raise exceptions for any input type; it consistently returns `3`.
+- No crashes or exceptions were observed for any input type during testing.
+- The function’s behavior is deterministic and does not depend on the value or type of `x`.

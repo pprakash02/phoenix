@@ -1,22 +1,23 @@
 # Module: `Problem 2 - Printing Out the User's Guess`
 
-> This module contains a utility function used in Hangman‑style games to display the current state of a secret word based on the letters the player has guessed so far. The function returns a string where correctly guessed letters are shown in their original positions and all other characters are represented by underscores.
+> This module implements a helper routine used in word‑guessing games (e.g., Hangman).  
+> The core function builds a visual representation of the secret word, revealing the letters that have already been guessed and masking the rest with underscores.
 
 ## Functions
 
 ### `getGuessedWord(secretWord, lettersGuessed)`
 
 **Description**  
-Constructs a visual representation of `secretWord` by revealing the letters that appear in `lettersGuessed` and replacing all other characters with underscores (`'_'`). The order of characters in the returned string matches the order in `secretWord`.
+Constructs a string that shows which characters of `secretWord` have been guessed.  
+For each character in `secretWord`, the function appends the character itself if it appears in the `lettersGuessed` list; otherwise it appends an underscore (`'_'`). The resulting string reflects the current state of the game board.
 
 **Parameters**
 
-- `secretWord` (*str*): The word that the user is trying to guess.
-- `lettersGuessed` (*list of str*): A collection of letters that have been guessed so far.  
-  *Typical usage expects each element to be a single‑character string (e.g., `['a', 'e', 'i']`).*
+- `secretWord` (*str*): The target word the user is trying to guess.
+- `lettersGuessed` (*list of str*): A collection of letters (or strings) that have been guessed so far. Membership is tested **exactly**; only single‑character strings that match a character in `secretWord` will be revealed.
 
 **Returns**  
-`result` (*str*): A string composed of the correctly guessed letters and underscores for the remaining letters. The length of the string equals `len(secretWord)`.
+- *str*: A string of the same length as `secretWord` composed of correctly guessed letters and underscores for unknown letters.
 
 **Examples**
 ```python
@@ -24,7 +25,7 @@ Constructs a visual representation of `secretWord` by revealing the letters that
 result = getGuessedWord('hello', ['apple', 'banana', 'cherry'])
 # → '_____'
 
-# Example 2 – one matching letter ('e')
+# Example 2 – one matching letter
 result = getGuessedWord('test', ['a', 'b', 'c', 'd', 'e'])
 # → '_e__'
 
@@ -32,16 +33,17 @@ result = getGuessedWord('test', ['a', 'b', 'c', 'd', 'e'])
 result = getGuessedWord('', [])
 # → ''
 
-# Example 4 – guessed list contains a multi‑character string; no match
+# Example 4 – guessed entry is a whole word, not a single letter
 result = getGuessedWord('a', ['hello'])
 # → '_'
 
-# Example 5 – none of the guessed strings match any character
+# Example 5 – list contains only multi‑character strings
 result = getGuessedWord('abcdef', ['test', 'word', 'example', 'data', 'value'])
 # → '______'
 ```
 
 **Edge Cases / Notes**
-- The function does **not** validate that items in `lettersGuessed` are single characters. If the list contains multi‑character strings (as shown in the examples), the membership test `l in lettersGuessed` will fail, resulting in an underscore for that position.
-- An empty `secretWord` returns an empty string (`''`).
-- The function performs a simple linear scan; its time complexity is **O(n × m)** where *n* is the length of `secretWord` and *m* is the length of `lettersGuessed`. For typical Hangman usage (small word lengths and short guess lists) this is negligible.
+- The function does **not** validate that items in `lettersGuessed` are single characters; any string longer than one character will never match a single character in `secretWord`.
+- An empty `secretWord` yields an empty string regardless of `lettersGuessed`.
+- Duplicate entries in `lettersGuessed` have no additional effect because membership testing is idempotent.
+- The function assumes iterable inputs; passing non‑iterable types will raise a `TypeError`.

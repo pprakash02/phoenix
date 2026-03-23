@@ -1,32 +1,35 @@
 # Module: `Problem 7`
 
-> This module provides utility functions for dictionary manipulation. Currently it implements a single helper, `dict_invert`, which creates an inverted mapping of a dictionary’s values to the list of keys that originally mapped to each value.
+> This module provides utility functions for manipulating dictionaries.  
+> Currently it contains a single function, `dict_invert`, which creates an inverted mapping from values to the keys that originally held them.
 
 ## Functions
 
 ### `dict_invert(d)`
 
-**Description**  
-Returns a new dictionary that inverts the mapping of the input dictionary `d`. For each unique value in `d`, the returned dictionary contains that value as a key, and its associated value is a **sorted list** of all original keys that mapped to it.
+**Description**:  
+Creates an inverted dictionary from the input mapping `d`. For each key‑value pair in `d`, the function adds the key to a list associated with the original value in the resulting dictionary. The lists of keys are kept in alphabetical (lexicographic) order.
 
-**Parameters**  
-- `d` (*dict*): The dictionary to be inverted. Keys can be any hashable type; values must also be hashable because they become keys in the resulting dictionary.
+**Parameters**:
+- `d` (*dict*): The dictionary to invert. Keys are expected to be hashable, and values must also be hashable because they become keys in the inverted dictionary.
 
-**Returns**  
-- *dict*: An inverted dictionary where each key is a value from the original `d` and each value is a sorted list of the original keys that corresponded to that value.
+**Returns**:  
+`dict` – An inverted dictionary where each original value maps to a **sorted list** of keys that had that value in `d`.
 
-**Examples**
+**Examples**:
 ```python
-# Example based on observed runtime behavior (invalid input)
-result = dict_invert('hello')   # → AttributeError: 'str' object has no attribute 'items'
+# Example with a proper dictionary (expected usage)
+input_dict = {'a': 1, 'b': 2, 'c': 1}
+result = dict_invert(input_dict)
+# result → {1: ['a', 'c'], 2: ['b']}
 
-# Correct usage example
-original = {'a': 1, 'b': 2, 'c': 1}
-result = dict_invert(original)
-# result == {1: ['a', 'c'], 2: ['b']}
+# Based on observed runtime behavior (invalid input)
+result = dict_invert('hello')  # → AttributeError: 'str' object has no attribute 'items'
+result = dict_invert(['test'])  # → AttributeError: 'list' object has no attribute 'items'
+result = dict_invert('')       # → AttributeError: 'str' object has no attribute 'items'
 ```
 
-**Edge Cases / Notes**  
-- **Non‑dictionary input**: If `d` is not a dictionary (e.g., a string, list, or any other type), the function will raise an `AttributeError` because it attempts to call `.items()` on the argument.  
-- **Duplicate values**: All keys that share the same value are collected into a list and sorted alphabetically (or according to the natural order of the key type).  
-- **Empty dictionary**: Passing an empty dictionary (`{}`) returns an empty dictionary (`{}`).
+**Edge Cases / Notes**:
+- The function assumes `d` implements the `items()` method (i.e., is a mapping). Passing a non‑dictionary object such as a string or list triggers an `AttributeError`.
+- If multiple keys share the same value, all those keys will appear in the list for that value, sorted alphabetically.
+- Values used as new keys must be hashable; unhashable values (e.g., lists) will raise a `TypeError` when used as dictionary keys.

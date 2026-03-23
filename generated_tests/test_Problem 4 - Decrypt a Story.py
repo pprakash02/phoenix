@@ -1,116 +1,95 @@
+import pytest
 import importlib.util
 import pathlib
 
-import pytest
-
-
-def load_module():
-    """
-    Dynamically load the target module using its file path.
-    Returns the imported module object.
-    """
-    module_path = pathlib.Path(
-        "/home/pprakash/phoenix/generated_tests/PX-714DB47F/workspace/Problem Set 5/Problem 4 - Decrypt a Story.py"
-    )
-    spec = importlib.util.spec_from_file_location("problem_4_decrypt_story", module_path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+# Load the target module dynamically using its absolute path.
+_MODULE_PATH = pathlib.Path(
+    "/home/pprakash/phoenix/generated_tests/PX-6DC06898/workspace/Problem Set 5/Problem 4 - Decrypt a Story.py"
+)
+_spec = importlib.util.spec_from_file_location(
+    "problem4_decrypt_story", _MODULE_PATH
+)
+_problem4 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_problem4)
 
 
 def test_decrypt_story_raises_name_error():
     """
-    Verify that calling ``decrypt_story`` without the required globals
-    raises a ``NameError`` because ``CiphertextMessage`` is not defined.
+    Verify that calling decrypt_story without the required globals
+    (CiphertextMessage and get_story_string) raises a NameError.
     """
-    mod = load_module()
+    # Ensure the module does NOT have the required names.
+    for name in ("CiphertextMessage", "get_story_string"):
+        if hasattr(_problem4, name):
+            delattr(_problem4, name)
+
     with pytest.raises(NameError):
-        mod.decrypt_story()
+        _problem4.decrypt_story()
 
 
-def test_decrypt_story_success(monkeypatch):
+def test_decrypt_story_returns_expected_tuple(monkeypatch):
     """
-    Monkey‑patch the missing dependencies with dummy implementations
-    and assert that ``decrypt_story`` returns the value produced by
-    ``CiphertextMessage.decrypt_message`` and that the encrypted string
-    is passed correctly.
+    Monkey‑patch the missing globals with dummy implementations and verify
+    that decrypt_story returns the tuple produced by CiphertextMessage.decrypt_message().
     """
-    mod = load_module()
+    # Dummy get_story_string returns a known encrypted string.
+    dummy_encrypted = "abcde"
+    monkeypatch.setattr(_problem4, "get_story_string", lambda: dummy_encrypted)
 
-    captured = {}
+    # Dummy CiphertextMessage records the input and returns a fixed tuple.
+    class DummyCiphertextMessage:
+        def __init__(self, text):
+            # Verify that the constructor receives the exact string from get_story_string.
+            assert text == dummy_encrypted
+            self.text = text
+
+        def decrypt_message(self):
+            # Return a deterministic shift and the reversed string.
+            return (5, self.text[::-1])
+
+    monkeypatch.setattr(_problem4, "CiphertextMessage", DummyCiphertextMessage)
+
+    result = _problem4.decrypt_story()
+    expected = (5, dummy_encrypted[::-1])
+    assert result == expected
+
+
+def test_decrypt_story_with_empty_string(monkeypatch):
+    """
+    Ensure decrypt_story works when get_story_string returns an empty string.
+    The dummy CiphertextMessage should handle it gracefully.
+    """
+    monkeypatch.setattr(_problem4, "get_story_string", lambda: "")
 
     class DummyCiphertextMessage:
         def __init__(self, text):
-            captured["text"] = text
+            assert text == ""
+            self.text = text
 
         def decrypt_message(self):
-            return (42, "dummy decrypted story")
+            return (0, self.text)  # No change for empty input.
 
-    def dummy_get_story_string():
-        return "encrypted story content"
+    monkeypatch.setattr(_problem4, "CiphertextMessage", DummyCiphertextMessage)
 
-    monkeypatch.setattr(mod, "CiphertextMessage", DummyCiphertextMessage)
-    monkeypatch.setattr(mod, "get_story_string", dummy_get_story_string)
-
-    result = mod.decrypt_story()
-
-    assert captured["text"] == "encrypted story content"
-    assert result == (42, "dummy decrypted story")
-
-
-def test_decrypt_story_empty_string(monkeypatch):
-    """
-    Ensure that ``decrypt_story`` works when the story string is empty.
-    The dummy ``CiphertextMessage`` records the received text and returns
-    a predictable tuple.
-    """
-    mod = load_module()
-
-    captured = {}
-
-    class DummyCiphertextMessage:
-        def __init__(self, text):
-            captured["text"] = text
-
-        def decrypt_message(self):
-            return (0, "")
-
-    def dummy_get_story_string():
-        return ""
-
-    monkeypatch.setattr(mod, "CiphertextMessage", DummyCiphertextMessage)
-    monkeypatch.setattr(mod, "get_story_string", dummy_get_story_string)
-
-    result = mod.decrypt_story()
-
-    assert captured["text"] == ""
+    result = _problem4.decrypt_story()
     assert result == (0, "")
 
 
-def test_decrypt_story_non_string_return(monkeypatch):
+def test_decrypt_story_propagates_exception(monkeypatch):
     """
-    Test the behaviour when ``get_story_string`` returns a non‑string value.
-    The dummy ``CiphertextMessage`` does not enforce type checking, so the
-    function should still forward the value and return the dummy result.
+    If CiphertextMessage.decrypt_message raises an exception,
+    decrypt_story should propagate that exception unchanged.
     """
-    mod = load_module()
-
-    captured = {}
+    monkeypatch.setattr(_problem4, "get_story_string", lambda: "data")
 
     class DummyCiphertextMessage:
         def __init__(self, text):
-            captured["text"] = text
+            self.text = text
 
         def decrypt_message(self):
-            return ("shift", ["list", "of", "words"])
+            raise ValueError("decryption failed")
 
-    def dummy_get_story_string():
-        return 12345  # non‑string input
+    monkeypatch.setattr(_problem4, "CiphertextMessage", DummyCiphertextMessage)
 
-    monkeypatch.setattr(mod, "CiphertextMessage", DummyCiphertextMessage)
-    monkeypatch.setattr(mod, "get_story_string", dummy_get_story_string)
-
-    result = mod.decrypt_story()
-
-    assert captured["text"] == 12345
-    assert result == ("shift", ["list", "of", "words"])
+    with pytest.raises(ValueError, match="decryption failed"):
+        _problem4.decrypt_story()

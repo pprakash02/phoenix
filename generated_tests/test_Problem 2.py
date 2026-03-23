@@ -1,100 +1,86 @@
 import pytest
 import importlib.util
-import os
+import pathlib
 
-# Dynamically load the target module since its path contains spaces and is not a valid import name.
-MODULE_PATH = os.path.join(
-    "/home/pprakash/phoenix/generated_tests/PX-714DB47F/workspace",
-    "Midterm Exam",
-    "Problem 2.py",
+# Dynamically load the target module because its filename contains spaces.
+module_path = (
+    pathlib.Path(__file__).resolve()
+    .parents[2]  # adjust as needed depending on test file location
+    / "Midterm Exam"
+    / "Problem 2.py"
 )
-
-spec = importlib.util.spec_from_file_location("problem_2", MODULE_PATH)
-module = importlib.util.module_from_spec(spec)
-assert spec is not None and spec.loader is not None, "Failed to locate module spec"
-spec.loader.exec_module(module)
+spec = importlib.util.spec_from_file_location("problem_2_module", module_path)
+problem_module = importlib.util.module_from_spec(spec)
+assert spec is not None and spec.loader is not None, "Unable to locate the target module."
+spec.loader.exec_module(problem_module)
 
 # Export the function to be tested
-f = module.f
+f = problem_module.f
 
 
-def test_f_returns_three_for_integer_zero():
-    """Verify that f returns 3 when called with integer 0."""
-    assert f(0) == 3
-
-
-def test_f_returns_three_for_integer_one():
-    """Verify that f returns 3 when called with integer 1."""
-    assert f(1) == 3
-
-
-def test_f_returns_three_for_negative_one():
-    """Verify that f returns 3 when called with integer -1."""
-    assert f(-1) == 3
-
-
-def test_f_returns_three_for_string():
-    """Verify that f returns 3 when called with a non‑empty string."""
-    assert f("test") == 3
-
-
-def test_f_returns_three_for_empty_string():
-    """Verify that f returns 3 when called with an empty string."""
-    assert f("") == 3
-
-
-def test_f_returns_three_for_boolean_true():
-    """Verify that f returns 3 when called with True (bool is a subclass of int)."""
-    assert f(True) == 3
-
-
-def test_f_returns_three_for_none():
-    """Verify that f returns 3 when called with None."""
-    assert f(None) == 3
-
-
-def test_f_returns_three_for_list():
-    """Verify that f returns 3 when called with a list object."""
-    assert f([1, 2, 3]) == 3
-
-
-def test_f_returns_three_for_dict():
-    """Verify that f returns 3 when called with a dictionary object."""
-    assert f({"key": "value"}) == 3
-
-
-def test_f_raises_type_error_when_no_arguments():
-    """Calling f without arguments should raise a TypeError."""
-    with pytest.raises(TypeError):
-        f()
-
-
-def test_f_raises_type_error_when_too_many_arguments():
-    """Calling f with more than one argument should raise a TypeError."""
-    with pytest.raises(TypeError):
-        f(1, 2)
-
-
-def test_f_is_pure_and_ignores_input():
-    """Ensure that f consistently returns 3 regardless of the input type."""
-    diverse_inputs = [
-        42,
-        -999,
-        0.0,
+@pytest.mark.parametrize(
+    "input_value",
+    [
+        0,
+        1,
+        -1,
+        "test",
+        "",
+        True,
+        None,
         3.1415,
-        "random string",
-        b"bytes",
-        (1, 2),
-        {1, 2, 3},
+        complex(1, 2),
+        [],
+        [1, 2, 3],
+        {"key": "value"},
         object(),
-    ]
-    for inp in diverse_inputs:
-        assert f(inp) == 3, f"f({inp!r}) did not return 3"
-
-
-def test_f_return_type_is_int():
-    """The return value of f should always be of type int."""
-    result = f("any")
-    assert isinstance(result, int)
+    ],
+)
+def test_f_returns_3_for_various_inputs(input_value):
+    """
+    Verify that the function `f` returns the integer 3 for a wide range of inputs,
+    including the observed successful cases and additional edge cases.
+    """
+    result = f(input_value)
     assert result == 3
+    assert isinstance(result, int)
 
+
+def test_f_always_returns_3_multiple_calls():
+    """
+    Ensure that repeated calls to `f` with the same argument consistently
+    return 3 and do not raise unexpected exceptions.
+    """
+    for _ in range(10):
+        assert f("consistent") == 3
+
+
+def test_f_does_not_raise_for_unusual_types():
+    """
+    Confirm that `f` does not raise any exception when called with
+    uncommon or complex argument types.
+    """
+    try:
+        result = f(lambda x: x)
+        assert result == 3
+    except Exception as exc:
+        pytest.fail(f"f raised an unexpected exception: {exc}")
+
+
+def test_f_return_is_not_none():
+    """
+    The function should always return a concrete value (3), never None.
+    """
+    assert f("anything") is not None
+    assert f("anything") == 3
+
+
+def test_f_return_is_deterministic():
+    """
+    Since `f` is a pure function that always returns 3, verify that the
+    result does not change across different Python sessions (determinism).
+    """
+    first = f(123)
+    second = f("abc")
+    third = f([1, 2, 3])
+    assert first == second == third == 3

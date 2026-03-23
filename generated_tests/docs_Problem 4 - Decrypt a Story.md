@@ -1,19 +1,19 @@
 # Module: `Problem 4 - Decrypt a Story`
 
-> This module provides a single utility function that attempts to decrypt an encoded story using the `CiphertextMessage` class. The story text is obtained via `get_story_string()`. The function is intended to return the plaintext version of the story, but it currently fails due to a missing import/definition of `CiphertextMessage`.
+> This module provides a single utility function that attempts to decrypt an encoded story using the `CiphertextMessage` class. The function retrieves the encrypted story via `get_story_string()` and then invokes the decryption routine. It is intended to return the plaintext version of the story, but the current implementation lacks the necessary import/definition for `CiphertextMessage`, leading to a runtime error.
 
 ## Functions
 
 ### `decrypt_story()`
 
 **Description**:  
-Retrieves an encrypted story string with `get_story_string()`, wraps it in a `CiphertextMessage` object, and returns the result of its `decrypt_message()` method, which should be the decrypted story text.
+Fetches the encrypted story string, wraps it in a `CiphertextMessage` object, and returns the result of its `decrypt_message()` method, which should be the decrypted (readable) story.
 
 **Parameters**:  
-- *(none)* – the function does not accept any arguments.
+- *None*
 
 **Returns**:  
-- `str` – the decrypted story text (expected when `CiphertextMessage` is properly defined).
+- `str`: The decrypted story text (expected when the required `CiphertextMessage` class is available).
 
 **Examples**:
 ```python
@@ -22,5 +22,5 @@ result = decrypt_story()  # → NameError: name 'CiphertextMessage' is not defin
 ```
 
 **Edge Cases / Notes**:
-- **Crash**: Calling the function as is raises a `NameError` because `CiphertextMessage` is not imported or defined within the module's scope.
-- To use this function successfully, ensure that `CiphertextMessage` (and its dependency `get_story_string`) are correctly imported from the appropriate library or module before invoking `decrypt_story()`.
+- **Crash observed**: The function raises a `NameError` because `CiphertextMessage` is not defined or imported in the module. To use this function successfully, ensure that the `CiphertextMessage` class (typically from the `caesar` or `crypto` module) is properly imported.
+- The function also depends on a `get_story_string()` callable that returns the ciphertext; this must be defined elsewhere in the codebase.

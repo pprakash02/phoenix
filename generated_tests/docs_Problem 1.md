@@ -1,67 +1,67 @@
 # Module: `Problem 1`
 
-> This module contains two mutually exclusive definitions of a function named `f`.  
-> Both implementations are recursive and rely on a while‑loop that never terminates for most inputs, leading to infinite recursion and eventual `RecursionError`. The second definition overwrites the first, so only the latter is reachable when the module is imported.
+> This module contains two definitions of a function named `f`. Both implementations demonstrate recursive patterns that lack proper termination conditions, which can lead to infinite recursion and eventual stack overflow. The first version attempts to recurse while `x` is greater than 3, and the second version builds a list while recursing for all positive values of `x`. Neither function returns a value; they implicitly return `None`.
 
 ## Functions
 
-### `f(x)` – First Definition  
+### `f(x)` – first definition
 
 ```python
 def f(x):
     while x > 3:
-        f(x + 1)
+        f(x+1)
 ```
 
 **Description**:  
-Recursively calls itself with an incremented argument (`x + 1`) as long as the original `x` is greater than 3. Because `x` is never modified inside the loop, the condition `x > 3` remains true, causing an infinite recursion.
+Recursively calls itself with an incremented argument (`x + 1`) as long as the original `x` is greater than 3. Because the loop condition never modifies `x`, the recursion never reaches a terminating condition, resulting in infinite recursion.
 
 **Parameters**:
-- `x` (*int*): The starting integer value that determines whether the recursion is entered. Must be greater than 3 to trigger the loop.
+- `x` (*int*): The starting integer value that determines whether the recursion will be entered. The function expects a numeric type that supports comparison with `3` and addition.
 
 **Returns**:  
-`None`. The function does not contain a return statement; execution ends only when a `RecursionError` is raised due to stack overflow.
+`None` – the function does not return a value explicitly.
 
 **Examples**:
 ```python
-# This call will raise RecursionError because the loop never terminates
-f(5)  # → RecursionError: maximum recursion depth exceeded
+# No runtime captures are available; the function would recurse indefinitely.
+# The following call will eventually raise a RecursionError.
+# f(5)  # → RecursionError: maximum recursion depth exceeded
 ```
 
 **Edge Cases / Notes**:
-- If `x <= 3`, the while‑condition is false and the function returns immediately (`None`).
-- For any `x > 3`, the function enters an endless recursion because `x` is never decreased or otherwise altered inside the loop.
-- The function will eventually hit Python’s recursion limit and raise a `RecursionError`.
+- The loop condition `while x > 3` never updates `x`, so the body executes forever once entered.
+- Calling `f` with any integer `x > 3` will cause infinite recursion and typically terminate with a `RecursionError`.
+- Calling `f` with `x <= 3` results in the function exiting immediately, returning `None`.
 
----  
 
-### `f(x)` – Second Definition (overwrites the first)  
+---
+
+### `f(x)` – second definition
 
 ```python
 def f(x):
     a = []
     while x > 0:
         a.append(x)
-        f(x - 1)
+        f(x-1)
 ```
 
 **Description**:  
-Creates a local list `a`, appends the current value of `x` to it, and recursively calls itself with a decremented argument (`x - 1`) while `x` remains positive. The loop condition never changes because `x` is not updated inside the `while` block, resulting in infinite recursion for any `x > 0`.
+Creates a local list `a` and, while `x` is positive, appends the current value of `x` to the list and recursively calls itself with `x-1`. Like the first version, it lacks a proper termination condition for the recursive call inside the loop, leading to potentially unbounded recursion.
 
 **Parameters**:
-- `x` (*int*): The starting integer value. Positive values trigger the recursive loop.
+- `x` (*int*): The starting integer value; the loop continues while `x` is greater than 0.
 
 **Returns**:  
-`None`. Like the first version, there is no explicit return statement; the function exits only via a `RecursionError`.
+`None` – the function does not return the constructed list; it implicitly returns `None`.
 
 **Examples**:
 ```python
-# This call will also raise RecursionError due to infinite recursion
-f(3)  # → RecursionError: maximum recursion depth exceeded
+# No runtime captures are available; the function will recurse until the recursion limit.
+# f(3)  # → RecursionError: maximum recursion depth exceeded
 ```
 
 **Edge Cases / Notes**:
-- If `x <= 0`, the while‑condition is false and the function returns immediately (`None`).
-- For any `x > 0`, the loop never updates `x`, so the recursion never reaches a base case.
-- The local list `a` is discarded on each recursive call, making the accumulation of values ineffective.
-- As with the first definition, the function will eventually exceed Python’s recursion depth limit and raise `RecursionError`.
+- Each recursive call creates its own list `a`; the lists are never returned or used outside their respective call frames.
+- For any `x > 0`, the recursion depth grows roughly linearly with the initial `x`, quickly exhausting the Python recursion limit.
+- If `x <= 0`, the `while` loop body never executes and the function returns immediately (`None`).

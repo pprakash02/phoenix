@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { submitContext } from '../services/api';
+import SetupProgress from '../components/SetupProgress';
 import './AnalysisPage.css';
 
 function AnalysisPage({ sessionData }) {
@@ -12,12 +13,17 @@ function AnalysisPage({ sessionData }) {
   if (!sessionData) {
     return (
       <div className="analysis-page animate-fade-in">
-        <div className="container">
-          <div className="empty-state">
-            <span className="empty-icon">📂</span>
-            <h2>No Project Loaded</h2>
-            <p>Go to Setup to start a new project analysis.</p>
-            <button className="btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+        <div className="page-two-col">
+          <div className="page-left">
+            <SetupProgress currentStep={1} />
+          </div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <span className="empty-icon">📂</span>
+              <h2>No Project Loaded</h2>
+              <p>Go to Setup to start a new project analysis.</p>
+              <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
+            </div>
           </div>
         </div>
       </div>
@@ -44,112 +50,126 @@ function AnalysisPage({ sessionData }) {
 
   return (
     <div className="analysis-page animate-fade-in">
-      <div className="container-wide">
-        <div className="page-header">
-          <span className="page-subtitle">CODE ANALYSIS</span>
-          <h1 className="page-title">Repository Files</h1>
-          <p className="page-desc">
+      <div className="page-two-col">
+        {/* ─── Left Sidebar ─── */}
+        <div className="page-left">
+          <div className="sidebar-badge">
+            <span className="badge-dot" />
+            Code Analysis
+          </div>
+          <h1 className="sidebar-title">Repository<br /><span>Files</span></h1>
+          <p className="sidebar-description">
             Found <strong>{files.length}</strong> Python files with{' '}
             <strong>{total_functions}</strong> functions ({total_testable} testable).
             Add context below for better test generation.
           </p>
-        </div>
 
-        <div className="stats-row">
-          <div className="stat-card">
-            <span className="stat-value">{files.length}</span>
-            <span className="stat-label">Files</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-value">{total_functions}</span>
-            <span className="stat-label">Functions</span>
-          </div>
-          <div className="stat-card accent">
-            <span className="stat-value">{total_testable}</span>
-            <span className="stat-label">Testable</span>
-          </div>
-        </div>
-
-        <div className="file-grid">
-          {files.map((file, index) => (
-            <div
-              key={file.path}
-              className={`file-card animate-slide-up ${expandedFile === file.path ? 'expanded' : ''}`}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div
-                className="file-card-header"
-                onClick={() => setExpandedFile(expandedFile === file.path ? null : file.path)}
-              >
-                <div className="file-info">
-                  <span className="file-icon">📄</span>
-                  <div>
-                    <span className="file-name">{file.name}</span>
-                    <span className="file-path">{file.path}</span>
-                  </div>
-                </div>
-                <div className="file-meta">
-                  <span className="chip chip-blue">{file.testable_count} testable</span>
-                  <span className="chip chip-gray">{file.function_count} functions</span>
-                  <span className="file-size">{(file.size / 1024).toFixed(1)} KB</span>
-                  <span className="expand-icon">{expandedFile === file.path ? '▲' : '▼'}</span>
-                </div>
-              </div>
-
-              {expandedFile === file.path && (
-                <div className="file-card-body">
-                  <div className="function-list">
-                    <h4>Functions:</h4>
-                    {file.functions.map((fn) => (
-                      <div key={fn.name} className={`function-item ${fn.testable ? '' : 'skipped'}`}>
-                        <code>{fn.name}({fn.args.join(', ')})</code>
-                        {fn.testable ? (
-                          <span className="chip chip-green chip-sm">TESTABLE</span>
-                        ) : (
-                          <span className="chip chip-amber chip-sm">SKIP</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="context-input-section">
-                    <label className="context-label">
-                      💡 Add context for this file (optional):
-                    </label>
-                    <textarea
-                      className="form-textarea context-textarea"
-                      placeholder="e.g., Focus on edge cases for negative numbers, test concurrency behavior..."
-                      value={fileContexts[file.path] || ''}
-                      onChange={(e) => handleContextChange(file.path, e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              )}
+          <div className="analysis-stats">
+            <div className="mini-stat">
+              <span className="mini-stat-value">{files.length}</span>
+              <span className="mini-stat-label">Files</span>
             </div>
-          ))}
+            <div className="mini-stat">
+              <span className="mini-stat-value">{total_functions}</span>
+              <span className="mini-stat-label">Functions</span>
+            </div>
+            <div className="mini-stat accent">
+              <span className="mini-stat-value">{total_testable}</span>
+              <span className="mini-stat-label">Testable</span>
+            </div>
+          </div>
+
+          <SetupProgress currentStep={1} />
         </div>
 
-        <div className="action-bar">
-          <button className="btn-secondary" onClick={() => navigate('/')}>
-            ← Back to Setup
-          </button>
-          <button
-            className={`btn-primary ${loading ? 'loading' : ''}`}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner" />
-                Starting Pipeline...
-              </>
-            ) : (
-              <>
-                Run Phoenix Pipeline 🔥
-              </>
-            )}
-          </button>
+        {/* ─── Right Panel ─── */}
+        <div className="page-right">
+          <div className="panel-card">
+            <div className="file-grid">
+              {files.map((file, index) => (
+                <div
+                  key={file.path}
+                  className={`file-card animate-slide-up ${expandedFile === file.path ? 'expanded' : ''}`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div
+                    className="file-card-header"
+                    onClick={() => setExpandedFile(expandedFile === file.path ? null : file.path)}
+                  >
+                    <div className="file-info">
+                      <span className="file-icon">📄</span>
+                      <div>
+                        <span className="file-name">{file.name}</span>
+                        <span className="file-path">{file.path}</span>
+                      </div>
+                    </div>
+                    <div className="file-meta">
+                      <span className="ph-chip purple">{file.testable_count} testable</span>
+                      <span className="ph-chip gray">{file.function_count} functions</span>
+                      <span className="file-size">{(file.size / 1024).toFixed(1)} KB</span>
+                      <span className="expand-icon">{expandedFile === file.path ? '▲' : '▼'}</span>
+                    </div>
+                  </div>
+
+                  {expandedFile === file.path && (
+                    <div className="file-card-body">
+                      <div className="function-list">
+                        <h4>Functions:</h4>
+                        {file.functions.map((fn) => (
+                          <div key={fn.name} className={`function-item ${fn.testable ? '' : 'skipped'}`}>
+                            <code>{fn.name}({fn.args.join(', ')})</code>
+                            {fn.testable ? (
+                              <span className="ph-chip green ph-chip-sm">TESTABLE</span>
+                            ) : (
+                              <span className="ph-chip amber ph-chip-sm">SKIP</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="context-input-section">
+                        <label className="context-label">
+                          💡 Add context for this file (optional):
+                        </label>
+                        <textarea
+                          className="ph-textarea"
+                          placeholder="e.g., Focus on edge cases for negative numbers, test concurrency behavior..."
+                          value={fileContexts[file.path] || ''}
+                          onChange={(e) => handleContextChange(file.path, e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="panel-footer">
+              <button className="ph-btn-ghost" onClick={() => navigate('/')}>
+                ← Back to Setup
+              </button>
+              <button
+                className={`ph-btn-primary ${loading ? 'loading' : ''}`}
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner" />
+                    Starting Pipeline...
+                  </>
+                ) : (
+                  <>
+                    Run Phoenix Pipeline
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 8h10M9 4l4 4-4 4"/>
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
