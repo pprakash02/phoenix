@@ -1,5 +1,6 @@
 # tools/doc_tools.py
 import os
+import re
 import ast
 import json
 import asyncio
@@ -49,6 +50,114 @@ def _extract_functions_source(file_path: str) -> list[dict]:
     return functions
 
 
+def _extract_cobol_structure(file_path: str) -> list[dict]:
+    """Extract user-defined COBOL paragraphs, sections, and their source from a COBOL file.
+    Filters out all standard COBOL reserved words and built-in constructs."""
+    from services.phoenix_engine import COBOL_RESERVED_WORDS
+
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        source = f.read()
+
+    structures = []
+    lines = source.splitlines()
+    seen = set()
+
+    # Find user-defined sections
+    for match in re.finditer(r'^\s{0,7}([A-Z0-9][A-Z0-9-]{0,29})\s+(SECTION)\s*\.', source, re.MULTILINE | re.IGNORECASE):
+        name = match.group(1).upper()
+        if name in COBOL_RESERVED_WORDS or name in seen:
+            continue
+        seen.add(name)
+        start_line = source[:match.start()].count('\n')
+        chunk = lines[start_line:min(start_line + 20, len(lines))]
+        structures.append({
+            "name": f"{match.group(1)} SECTION",
+            "args": [],
+            "source": "\n".join(chunk),
+        })
+
+    # Find user-defined paragraphs
+    for match in re.finditer(r'^\s{7,11}([A-Z0-9][A-Z0-9-]{0,29})\s*\.\s*$', source, re.MULTILINE | re.IGNORECASE):
+        name = match.group(1).upper()
+        if name in COBOL_RESERVED_WORDS or name in seen:
+            continue
+        seen.add(name)
+        start_line = source[:match.start()].count('\n')
+        chunk = lines[start_line:min(start_line + 15, len(lines))]
+        structures.append({
+            "name": match.group(1),
+            "args": [],
+            "source": "\n".join(chunk),
+        })
+
+    # If no user-defined structures found, treat the whole program as one block
+    if not structures:
+        structures.append({
+            "name": "MAIN-PROGRAM",
+            "args": [],
+            "source": source[:3000] if len(source) > 3000 else source,
+        })
+
+    return structures
+
+
+def _is_cobol_file(file_path: str) -> bool:
+    """Check if a file is a COBOL source file by extension."""
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in ('.cob', '.cbl', '.cpy')
+
+
+def _is_c_file(file_path: str) -> bool:
+    """Check if a file is a C source file by extension."""
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in ('.c', '.h')
+
+
+def _extract_c_structure(file_path: str) -> list[dict]:
+    """Extract C functions and their source for documentation."""
+    from services.phoenix_engine import extract_c_functions
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        source = f.read()
+
+    functions = extract_c_functions(file_path)
+    source_lines = source.splitlines()
+
+    # Try to extract each function's source using brace matching
+    result = []
+    for fn in functions:
+        # Find the function definition line
+        func_source = ""
+        pattern = re.compile(rf'\b{re.escape(fn["name"])}\s*\(')
+        for i, line in enumerate(source_lines):
+            if pattern.search(line):
+                # Found it — extract until closing brace
+                brace_count = 0
+                started = False
+                end_line = i
+                for j in range(i, min(i + 200, len(source_lines))):
+                    brace_count += source_lines[j].count('{')
+                    if brace_count > 0:
+                        started = True
+                    brace_count -= source_lines[j].count('}')
+                    if started and brace_count <= 0:
+                        end_line = j + 1
+                        break
+                func_source = "\n".join(source_lines[i:end_line])
+                break
+
+        if not func_source:
+            func_source = f"/* Function {fn['name']} — source not extracted */"
+
+        result.append({
+            "name": fn["name"],
+            "args": fn["args"],
+            "return_type": fn.get("return_type", "void"),
+            "source": func_source,
+        })
+
+    return result
+
+
 def _build_capture_summary(records: list[dict], func_name: str) -> str:
     """Build a human-readable summary of observed I/O for a function."""
     func_records = [r for r in records if r.get("function") == func_name]
@@ -74,9 +183,15 @@ def _build_capture_summary(records: list[dict], func_name: str) -> str:
     return "\n".join(lines) if lines else "No captures."
 
 
-def _generate_docs_via_llm(module_name: str, source_path: str,
-                           functions: list[dict], records: list[dict]) -> str:
+async def _generate_docs_via_llm(module_name: str, source_path: str,
+                           functions: list[dict], records: list[dict],
+                           is_cobol: bool = False, is_c: bool = False) -> str:
     """Use the LLM to generate comprehensive markdown documentation."""
+    if is_cobol:
+        return await _generate_cobol_docs_via_llm(module_name, source_path, functions)
+    if is_c:
+        return await _generate_c_docs_via_llm(module_name, source_path, functions)
+
     # Build context for each function
     func_sections = []
     for func in functions:
@@ -138,40 +253,173 @@ RULES:
 - Use the observed inputs/outputs as real examples in the documentation.
 - Be concise but thorough.
 - Return ONLY the Markdown documentation, no preamble.
+- Do NOT use markdown tables. Use bullet lists instead for parameters and return values.
 """
 
-    # Run LLM call (handle running event loop)
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = None
+    response = await client.get_response(
+        messages=[Message("user", [prompt])],
+        default_options={"temperature": 0.1}
+    )
 
-    if loop and loop.is_running():
-        import concurrent.futures
-        with concurrent.futures.ThreadPoolExecutor(1) as pool:
-            def run_sync():
-                return asyncio.run(client.get_response(
-                    messages=[Message("user", [prompt])],
-                    default_options={"temperature": 0.1}
-                ))
-            response = pool.submit(run_sync).result()
-    else:
-        response = asyncio.run(client.get_response(
-            messages=[Message("user", [prompt])],
-            default_options={"temperature": 0.1}
-        ))
+    return response.messages[-1].text
+
+
+async def _generate_cobol_docs_via_llm(module_name: str, source_path: str,
+                                       structures: list[dict]) -> str:
+    """Use the LLM to generate COBOL-specific markdown documentation."""
+    struct_sections = []
+    for s in structures:
+        struct_sections.append(f"""
+### {s['name']}
+
+Source code:
+```cobol
+{s['source']}
+```
+""")
+
+    all_struct_context = "\n".join(struct_sections)
+
+    prompt = f"""You are a COBOL technical documentation writer. Generate comprehensive, professional Markdown documentation for the following COBOL program.
+
+Program name: {module_name}
+Source file: {source_path}
+
+User-defined paragraphs/sections found:
+{all_struct_context}
+
+Generate documentation with this EXACT structure:
+
+# COBOL Program: `{module_name}`
+
+> Brief program summary paragraph describing its purpose.
+
+## Program Structure
+
+Describe the overall structure: which DIVISIONS are present, the program flow.
+
+## Data Division
+
+Document the key data items defined in WORKING-STORAGE SECTION, LINKAGE SECTION, etc.
+For each significant variable group or record structure:
+- Variable name, PIC clause, initial VALUE
+- Purpose/usage in the program
+
+## Procedure Division
+
+For EACH user-defined paragraph or section, generate:
+
+### `PARAGRAPH-NAME`
+
+**Purpose**: Clear explanation of what this paragraph does.
+
+**Data Items Used**: List the key variables read/modified.
+
+**Control Flow**: Describe any PERFORM, GO TO, CALL, or conditional logic.
+
+**Business Logic**: Describe the business rules implemented.
+
+---
+
+RULES:
+- Document ONLY user-defined paragraphs and sections, NOT built-in COBOL verbs.
+- Focus on the business logic and data transformations.
+- Describe the PERFORM hierarchy (which paragraphs call which).
+- Note any COPY statements, CALL to external programs, or file I/O operations.
+- Be concise but thorough.
+- Return ONLY the Markdown documentation, no preamble.
+- Do NOT use markdown tables. Use bullet lists instead.
+"""
+
+    response = await client.get_response(
+        messages=[Message("user", [prompt])],
+        default_options={"temperature": 0.1}
+    )
+
+    return response.messages[-1].text
+
+
+async def _generate_c_docs_via_llm(module_name: str, source_path: str,
+                                   functions: list[dict]) -> str:
+    """Use the LLM to generate C-specific markdown documentation."""
+    func_sections = []
+    for fn in functions:
+        args = ", ".join(fn.get("args", []))
+        ret = fn.get("return_type", "void")
+        func_sections.append(f"""
+### `{ret} {fn['name']}({args})`
+
+Source code:
+```c
+{fn['source']}
+```
+""")
+
+    all_func_context = "\n".join(func_sections)
+
+    prompt = f"""You are a C technical documentation writer. Generate comprehensive, professional Markdown documentation for the following C module.
+
+Module name: {module_name}
+Source file: {source_path}
+
+Functions found:
+{all_func_context}
+
+Generate documentation with this EXACT structure:
+
+# C Module: `{module_name}`
+
+> Brief module summary paragraph describing its purpose.
+
+## Overview
+
+Describe the overall purpose, key data structures, and #include dependencies.
+
+## Functions
+
+For EACH function, generate:
+
+### `return_type function_name(params)`
+
+**Description**: Clear explanation of what the function does.
+
+**Parameters**:
+- `param_name` (*type*): description
+
+**Returns**: What the function returns, with type.
+
+**Algorithm / Logic**: Describe the key logic steps.
+
+**Edge Cases / Notes**:
+- Any known limitations or special behaviors.
+
+---
+
+RULES:
+- Document ALL functions found in the source.
+- Be concise but thorough about the algorithm and business logic.
+- Describe any global variables or structs used.
+- Note any pointer parameters and whether they are input, output, or both.
+- Return ONLY the Markdown documentation, no preamble.
+- Do NOT use markdown tables. Use bullet lists instead for parameters and return values.
+"""
+
+    response = await client.get_response(
+        messages=[Message("user", [prompt])],
+        default_options={"temperature": 0.1}
+    )
 
     return response.messages[-1].text
 
 
 @tool(approval_mode="never_require")
-def generate_docs(
+async def generate_docs(
     legacy_file_path: Annotated[str, Field(
-        description="Path to the legacy Python file, e.g. 'legacy_workspace/hangman.py'."
+        description="Path to the legacy source file, e.g. 'legacy_workspace/hangman.py' or 'legacy_workspace/billing.cob'."
     )]
 ) -> str:
     """
-    Generate comprehensive Markdown documentation for a legacy Python module.
+    Generate comprehensive Markdown documentation for a legacy module (Python or COBOL).
     Reads the source code and observer runtime captures, then uses an LLM to
     produce professional documentation with descriptions, parameter tables,
     examples (from real observed I/O), and edge-case notes.
@@ -183,21 +431,34 @@ def generate_docs(
     if not os.path.exists(abs_path):
         return f"ERROR: File not found: {legacy_file_path}"
 
-    module_name = os.path.basename(abs_path).replace(".py", "")
+    # Determine language
+    is_cobol = _is_cobol_file(abs_path)
+    is_c = _is_c_file(abs_path)
+    ext = os.path.splitext(os.path.basename(abs_path))[1]
+    module_name = os.path.basename(abs_path).replace(ext, "")
 
-    # Extract function source code
-    functions = _extract_functions_source(abs_path)
+    # Extract structure based on language
+    if is_cobol:
+        functions = _extract_cobol_structure(abs_path)
+    elif is_c:
+        functions = _extract_c_structure(abs_path)
+    else:
+        functions = _extract_functions_source(abs_path)
+
     if not functions:
-        return f"No functions found in {legacy_file_path}."
+        return f"No functions/structures found in {legacy_file_path}."
 
-    # Load observer captures
+    # Load observer captures (may be empty for COBOL/C)
     records = _load_captures_for_module(module_name)
 
-    print(f"\n[SYSTEM] Generating documentation for {module_name} "
-          f"({len(functions)} functions, {len(records)} capture records)...\n")
+    lang_label = "COBOL" if is_cobol else ("C" if is_c else "Python")
+    item_label = "paragraphs" if is_cobol else "functions"
+    print(f"\n[SYSTEM] Generating {lang_label} documentation for {module_name} "
+          f"({len(functions)} {item_label}, {len(records)} capture records)...\n")
 
     # Generate docs via LLM
-    markdown = _generate_docs_via_llm(module_name, legacy_file_path, functions, records)
+    markdown = await _generate_docs_via_llm(module_name, legacy_file_path, functions, records,
+                                           is_cobol=is_cobol, is_c=is_c)
 
     # Save markdown
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -209,13 +470,13 @@ def generate_docs(
     pdf_file = os.path.join(OUTPUT_DIR, f"docs_{module_name}.pdf")
     pdf_status = _convert_md_to_pdf(doc_file, pdf_file)
 
-    func_names = [fn["name"] for fn in functions]
+    item_names = [fn["name"] for fn in functions]
     return (
-        f"Generated documentation for {module_name}.py — {len(functions)} functions documented.\n"
-        f"Functions: {', '.join(func_names)}\n"
+        f"Generated documentation for {module_name}{ext} — {len(functions)} {item_label} documented.\n"
+        f"{item_label.title()}: {', '.join(item_names)}\n"
         f"Markdown: {doc_file}\n"
         f"PDF: {pdf_status}\n"
-        f"Documentation includes descriptions, parameter descriptions, examples from runtime captures, and edge-case notes."
+        f"Documentation includes descriptions, parameter descriptions, examples, and edge-case notes."
     )
 
 

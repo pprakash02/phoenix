@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
 import './Navbar.css';
 
 function Navbar() {
@@ -24,29 +25,18 @@ function Navbar() {
 
         <div className="navbar-center">
           <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
-            Dashboard
+            Create
+          </Link>
+          <Link to="/history" className={`nav-link ${isActive('/history') ? 'active' : ''}`} id="nav-history-link">
+            History
           </Link>
           <Link to="/results" className={`nav-link ${isActive('/results') ? 'active' : ''}`}>
-            Projects
+            Results
           </Link>
         </div>
 
-        <div className="navbar-right">
-          <button className="nav-icon-btn" title="Notifications">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 7.5a5 5 0 0 0-10 0c0 5.833-2.5 7.5-2.5 7.5h15S15 13.333 15 7.5"/>
-              <path d="M11.45 17.5a1.667 1.667 0 0 1-2.9 0"/>
-            </svg>
-          </button>
-          <div className="nav-avatar">
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=phoenix"
-              alt="User"
-              width="32"
-              height="32"
-            />
-          </div>
-        </div>
+        <div className="navbar-right" />
+
       </div>
     </nav>
   );

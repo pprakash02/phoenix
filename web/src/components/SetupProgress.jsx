@@ -10,8 +10,8 @@ import './SetupProgress.css';
 function SetupProgress({ currentStep = 1 }) {
   const steps = [
     { num: 1, label: 'Project Details', sub: 'Source & AI Context', path: '/' },
-    { num: 2, label: 'Architecture Review', sub: 'Review generated schemas', path: '/review' },
-    { num: 3, label: 'Final Results', sub: 'Download and Create PR', path: '/results' },
+    { num: 2, label: 'Validate Output', sub: 'Review Generated Schemas', path: '/review' },
+    { num: 3, label: 'Final Results', sub: 'Download and Create Pull Request', path: '/results' },
   ];
 
   return (
@@ -61,7 +61,7 @@ function SetupProgress({ currentStep = 1 }) {
             <circle cx="8" cy="8" r="6.5"/>
             <path d="M5.5 8L7 9.5L10.5 6" />
           </svg>
-          <span>Test Suite for Legacy Functions</span>
+          <span>Test Suite for Legacy Codes</span>
         </div>
         <div className="sp-output-item">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">

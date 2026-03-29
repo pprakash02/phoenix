@@ -1,26 +1,23 @@
 /* ═══════════════════════════════════════════════════
-   NAVBAR — New Design
+   NAVBAR — Navigation Bar Styles
    ═══════════════════════════════════════════════════ */
 
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
   background: var(--color-nav-bg);
   border-bottom: 1px solid var(--color-border);
-  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .navbar-inner {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-xl);
+  height: 60px;
 }
 
 .navbar-left {
@@ -33,36 +30,32 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--color-text-primary);
 }
 
 .brand-logo {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .brand-text {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
   color: var(--color-text-primary);
+  letter-spacing: -0.02em;
 }
 
 .navbar-center {
   display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+  gap: 4px;
 }
 
 .nav-link {
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-text-secondary);
-  text-decoration: none;
+  border-radius: var(--radius-md);
   transition: all var(--transition-fast);
+  text-decoration: none;
 }
 
 .nav-link:hover {
@@ -71,26 +64,27 @@
 }
 
 .nav-link.active {
-  color: var(--color-text-primary);
+  color: #6C5CE7;
+  background: rgba(108, 92, 231, 0.08);
   font-weight: 600;
-  background: var(--color-bg);
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 8px;
+  position: relative;
 }
 
 .nav-icon-btn {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
+  background: none;
   border: none;
-  background: transparent;
+  border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -101,23 +95,99 @@
   color: var(--color-text-primary);
 }
 
-.nav-avatar {
+/* ── User Avatar ── */
+.nav-avatar-wrap {
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.nav-avatar-wrap:hover {
+  transform: scale(1.05);
+}
+
+.nav-avatar-initials {
   width: 34px;
   height: 34px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* ── User Dropdown ── */
+.nav-user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
-  border: 2px solid var(--color-border);
-  cursor: pointer;
-  transition: border-color var(--transition-fast);
+  z-index: 200;
 }
 
-.nav-avatar:hover {
-  border-color: var(--color-accent);
+.nav-dropdown-header {
+  padding: 14px 16px;
 }
 
-.nav-avatar img {
+.nav-dropdown-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.nav-dropdown-email {
+  font-size: 0.78rem;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.nav-dropdown-divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.nav-dropdown-item:hover {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.nav-dropdown-item.logout {
+  color: var(--color-error);
+}
+
+.nav-dropdown-item.logout:hover {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .navbar-center {
+    display: none;
+  }
 }

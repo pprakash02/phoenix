@@ -1,53 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { getResults, getDownloadUrl, createPR } from '../services/api';
+import { getResults, getDownloadUrl } from '../services/api';
 import SetupProgress from '../components/SetupProgress';
 import './ResultsPage.css';
 
 function ResultsPage({ sessionData }) {
   const navigate = useNavigate();
-  const sessionId = sessionData?.session_id;
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlSessionId = searchParams.get('session');
+  const sessionId = sessionData?.session_id || urlSessionId;
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [expandedFile, setExpandedFile] = useState(null);
-  const [showPR, setShowPR] = useState(false);
-  const [githubToken, setGithubToken] = useState('');
-  const [branchName, setBranchName] = useState('');
-  const [prLoading, setPrLoading] = useState(false);
-  const [prResult, setPrResult] = useState(null);
-  const [prError, setPrError] = useState('');
 
-  useEffect(() => {
-    if (sessionId) {
-      getResults(sessionId)
-        .then((data) => {
-          setResults(data);
-          setBranchName(`phoenix/test-suite-${sessionId}`);
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    } else {
+  const fetchResults = useCallback(() => {
+    if (!sessionId) {
       setLoading(false);
-    }
-  }, [sessionId]);
-
-  const handleCreatePR = async () => {
-    if (!githubToken.trim()) {
-      setPrError('GitHub token is required');
       return;
     }
-    setPrLoading(true);
-    setPrError('');
-    try {
-      const result = await createPR(sessionId, githubToken, branchName);
-      setPrResult(result);
-    } catch (err) {
-      setPrError(err.message);
-    } finally {
-      setPrLoading(false);
+    setLoading(true);
+    setFetchError(null);
+    getResults(sessionId)
+      .then((data) => {
+        setResults(data);
+        setFetchError(null);
+      })
+      .catch((err) => {
+        setFetchError(err.message || 'Results not available yet');
+      })
+      .finally(() => setLoading(false));
+  }, [sessionId]);
+
+  useEffect(() => {
+    fetchResults();
+  }, [fetchResults]);
+
+  // Auto-retry if results aren't ready yet (poll up to 5 times)
+  const retryCountRef = {current: 0};
+  useEffect(() => {
+    if (fetchError && retryCountRef.current < 5) {
+      const timer = setTimeout(() => {
+        retryCountRef.current += 1;
+        fetchResults();
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [fetchError, fetchResults]);
+
 
   if (!sessionId) {
     return (
@@ -56,7 +57,9 @@ function ResultsPage({ sessionData }) {
           <div className="page-left"><SetupProgress currentStep={3} /></div>
           <div className="page-right">
             <div className="empty-state-card">
-              <span className="empty-icon">📊</span>
+              <svg className="empty-icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z" />
+              </svg>
               <h2>No Results Available</h2>
               <p>Complete a pipeline run to see results here.</p>
               <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
@@ -76,6 +79,33 @@ function ResultsPage({ sessionData }) {
             <div className="empty-state-card">
               <span className="spinner large" />
               <p>Loading results...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state with retry button
+  if (fetchError && !results) {
+    return (
+      <div className="results-page animate-fade-in">
+        <div className="page-two-col">
+          <div className="page-left"><SetupProgress currentStep={3} /></div>
+          <div className="page-right">
+            <div className="empty-state-card">
+              <svg className="empty-icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <h2>Results Loading</h2>
+              <p>{fetchError}</p>
+              <button className="ph-btn-primary" onClick={fetchResults} style={{ marginTop: '1rem' }}>
+                ↻ Retry
+              </button>
+              <button className="ph-btn-ghost" onClick={() => navigate('/')} style={{ marginTop: '0.5rem' }}>
+                ← Back to Setup
+              </button>
             </div>
           </div>
         </div>
@@ -106,21 +136,35 @@ function ResultsPage({ sessionData }) {
 
           <div className="results-stats-sidebar">
             <div className="result-stat-card success">
-              <div className="result-stat-icon">✅</div>
+              <div className="result-stat-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 10l3 3 5-6" />
+                  <circle cx="10" cy="10" r="8" />
+                </svg>
+              </div>
               <div>
                 <span className="result-stat-title">Tests Generated</span>
                 <span className="result-stat-value">{Object.keys(testFiles).length} test files</span>
               </div>
             </div>
             <div className="result-stat-card info">
-              <div className="result-stat-icon">📄</div>
+              <div className="result-stat-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#6C5CE7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h12v14H4z" />
+                  <path d="M7 8h6M7 11h4" />
+                </svg>
+              </div>
               <div>
                 <span className="result-stat-title">Documentation</span>
                 <span className="result-stat-value">{Object.keys(docFiles).length} doc files</span>
               </div>
             </div>
             <div className="result-stat-card accent">
-              <div className="result-stat-icon">🔥</div>
+              <div className="result-stat-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 2l2.4 4.8L18 7.6l-4 3.9.9 5.5L10 14.4l-4.9 2.6.9-5.5-4-3.9 5.6-.8z" />
+                </svg>
+              </div>
               <div>
                 <span className="result-stat-title">Status</span>
                 <span className="ph-chip green">PHOENIX APPROVED</span>
@@ -152,7 +196,19 @@ function ResultsPage({ sessionData }) {
                     onClick={() => setExpandedFile(expandedFile === file.name ? null : file.name)}
                   >
                     <div className="results-file-info">
-                      <span className="results-file-icon">{file.type === 'test' ? '🧪' : '📄'}</span>
+                      <span className="results-file-icon">
+                        {file.type === 'test' ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6C5CE7" strokeWidth="1.5">
+                            <path d="M6 3l4 5-4 5" />
+                            <circle cx="8" cy="8" r="7" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#10b981" strokeWidth="1.5">
+                            <path d="M3 2h7l3 3v9H3z" />
+                            <path d="M5 7h6M5 10h4" />
+                          </svg>
+                        )}
+                      </span>
                       <div>
                         <span className="results-file-name">{file.name}</span>
                         <span className="results-file-meta">
@@ -194,71 +250,16 @@ function ResultsPage({ sessionData }) {
                   className="ph-btn-primary download-link"
                   download
                 >
-                  ⬇ Download All
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8 2v9M4 8l4 4 4-4M2 14h12" />
+                  </svg>
+                  Download All
                 </a>
-                <button className="ph-btn-primary pr-btn" onClick={() => setShowPR(true)}>
-                  🔀 Create Pull Request
-                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* PR Creation Modal */}
-      {showPR && (
-        <div className="modal-overlay" onClick={() => setShowPR(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h3>🔀 Create Pull Request</h3>
-            <p>Push the generated test suite and documentation to a new branch on your repository.</p>
-
-            {prResult ? (
-              <div className="pr-success">
-                <span className="pr-success-icon">🎉</span>
-                <p>Pull Request created successfully!</p>
-                <a href={prResult.url} target="_blank" rel="noopener noreferrer" className="pr-link">
-                  View PR #{prResult.number} →
-                </a>
-              </div>
-            ) : (
-              <>
-                {prError && (
-                  <div className="ph-error">{prError}</div>
-                )}
-
-                <div className="modal-field">
-                  <label>GitHub Personal Access Token</label>
-                  <input
-                    type="password"
-                    className="ph-input"
-                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                    value={githubToken}
-                    onChange={(e) => setGithubToken(e.target.value)}
-                  />
-                  <span className="ph-hint">Needs 'repo' scope. Token is not stored.</span>
-                </div>
-
-                <div className="modal-field">
-                  <label>Branch Name</label>
-                  <input
-                    type="text"
-                    className="ph-input"
-                    value={branchName}
-                    onChange={(e) => setBranchName(e.target.value)}
-                  />
-                </div>
-
-                <div className="modal-actions">
-                  <button className="ph-btn-ghost" onClick={() => setShowPR(false)}>Cancel</button>
-                  <button className="ph-btn-primary" onClick={handleCreatePR} disabled={prLoading}>
-                    {prLoading ? <span className="spinner" /> : 'Create PR'}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

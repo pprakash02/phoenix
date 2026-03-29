@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getResults, approveTests, rejectTests } from '../services/api';
-import { useSocket } from '../hooks/useSocket';
+import { useSocket, clearAllPipelineState } from '../hooks/useSocket';
 import SetupProgress from '../components/SetupProgress';
 import './ReviewPage.css';
 
@@ -50,6 +50,8 @@ function ReviewPage({ sessionData }) {
     try {
       await rejectTests(sessionId, rejectComments);
       setShowReject(false);
+      // Clear old pipeline state so progress page starts fresh for the re-run
+      clearAllPipelineState();
       navigate('/progress');
     } catch (err) {
       console.error(err);
@@ -65,7 +67,10 @@ function ReviewPage({ sessionData }) {
           <div className="page-left"><SetupProgress currentStep={2} /></div>
           <div className="page-right">
             <div className="empty-state-card">
-              <span className="empty-icon">📋</span>
+              <svg className="empty-icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                <rect x="9" y="3" width="6" height="4" rx="2" />
+              </svg>
               <h2>No Results to Review</h2>
               <p>Run a pipeline first to generate test suites.</p>
               <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
@@ -151,7 +156,19 @@ function ReviewPage({ sessionData }) {
                     onClick={() => setExpandedFile(expandedFile === file.name ? null : file.name)}
                   >
                     <div className="review-file-info">
-                      <span className="review-file-icon">{file.type === 'test' ? '🧪' : '📄'}</span>
+                      <span className="review-file-icon">
+                        {file.type === 'test' ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6C5CE7" strokeWidth="1.5">
+                            <path d="M6 3l4 5-4 5" />
+                            <circle cx="8" cy="8" r="7" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#10b981" strokeWidth="1.5">
+                            <path d="M3 2h7l3 3v9H3z" />
+                            <path d="M5 7h6M5 10h4" />
+                          </svg>
+                        )}
+                      </span>
                       <div>
                         <span className="review-file-name">{file.name}</span>
                         <span className="review-file-meta">
@@ -185,7 +202,13 @@ function ReviewPage({ sessionData }) {
             {/* Agent Conversation Log */}
             {conversationLog.length > 0 && (
               <div className="conversation-section">
-                <h3>🤖 Agent Conversation</h3>
+                <h3>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#6C5CE7" strokeWidth="1.5" style={{verticalAlign: 'middle', marginRight: '6px'}}>
+                    <circle cx="9" cy="9" r="7" />
+                    <path d="M9 6v4M6 13h6" />
+                  </svg>
+                  Agent Conversation
+                </h3>
                 <div className="conversation-log">
                   {conversationLog.slice(0, 20).map((msg, idx) => (
                     <div key={idx} className={`conversation-msg ${msg.author.toLowerCase()}`}>
@@ -231,7 +254,13 @@ function ReviewPage({ sessionData }) {
       {showReject && (
         <div className="modal-overlay" onClick={() => setShowReject(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h3>📝 Rejection Comments</h3>
+            <h3>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{verticalAlign: 'middle', marginRight: '4px'}}>
+                <path d="M3 3h10v10H3z" />
+                <path d="M6 6h4M6 9h2" />
+              </svg>
+              Rejection Comments
+            </h3>
             <p>Describe what needs improvement. The pipeline will re-run with your feedback.</p>
             <textarea
               className="ph-textarea"

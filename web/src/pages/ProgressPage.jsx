@@ -17,26 +17,44 @@ const STAGE_LABELS = {
   complete: 'Complete',
 };
 
+const KEY_STAGES = 'phoenix_progressStages';
+const KEY_MAX_PROGRESS = 'phoenix_maxProgress';
+
+function safeParse(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch { return fallback; }
+}
+
 function ProgressPage({ sessionData }) {
   const navigate = useNavigate();
   const sessionId = sessionData?.session_id;
   const { isConnected, progress, pipelineResult, error } = useSocket(sessionId);
-  const [stages, setStages] = useState([]);
-  const [contextInput, setContextInput] = useState('');
-  const maxProgressRef = useRef(0);
 
+  // Restore stages and maxProgress from localStorage so tab-switching preserves state
+  const [stages, setStages] = useState(() => safeParse(KEY_STAGES, []));
+  const maxProgressRef = useRef(safeParse(KEY_MAX_PROGRESS, 0));
+
+  // Update stages when new progress arrives via WebSocket
   useEffect(() => {
     if (progress) {
       setStages((prev) => {
         const exists = prev.find((s) => s.stage === progress.stage);
+        let next;
         if (exists) {
-          return prev.map((s) => s.stage === progress.stage ? { ...s, ...progress } : s);
+          next = prev.map((s) => s.stage === progress.stage ? { ...s, ...progress } : s);
+        } else {
+          next = [...prev, progress];
         }
-        return [...prev, progress];
+        // Persist to localStorage so tab-switches preserve the timeline
+        try { localStorage.setItem(KEY_STAGES, JSON.stringify(next)); } catch {}
+        return next;
       });
     }
   }, [progress]);
 
+  // Navigate to review ONLY on live pipeline_complete (pipelineResult is never restored from storage)
   useEffect(() => {
     if (pipelineResult) {
       navigate('/review');
@@ -52,7 +70,12 @@ function ProgressPage({ sessionData }) {
           </div>
           <div className="page-right">
             <div className="empty-state-card">
-              <span className="empty-icon">🚀</span>
+              <svg className="empty-icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+              </svg>
               <h2>No Active Pipeline</h2>
               <p>Start a project from the Setup page to begin.</p>
               <button className="ph-btn-primary" onClick={() => navigate('/')}>Go to Setup</button>
@@ -63,18 +86,19 @@ function ProgressPage({ sessionData }) {
     );
   }
 
-  const currentStage = progress?.stage || 'preparing';
+  const currentStage = progress?.stage || (stages.length > 0 ? stages[stages.length - 1].stage : 'preparing');
   // Unidirectional: only allow increases, cap at 100%
   const rawProgress = Math.min(progress?.progress || 0, 100);
   if (rawProgress > maxProgressRef.current) {
     maxProgressRef.current = rawProgress;
+    try { localStorage.setItem(KEY_MAX_PROGRESS, JSON.stringify(rawProgress)); } catch {}
   }
   const progressPercent = maxProgressRef.current;
 
   return (
     <div className="progress-page animate-fade-in">
       <div className="page-two-col">
-        {/* ─── Left Sidebar ─── */}
+        {/* Left Sidebar */}
         <div className="page-left">
           <div className="sidebar-badge">
             <span className="badge-dot pulse" />
@@ -95,7 +119,7 @@ function ProgressPage({ sessionData }) {
           <SetupProgress currentStep={2} />
         </div>
 
-        {/* ─── Right Panel ─── */}
+        {/* Right Panel */}
         <div className="page-right">
           <div className="panel-card">
             {error && (
@@ -162,19 +186,6 @@ function ProgressPage({ sessionData }) {
                   </div>
                 );
               })}
-            </div>
-
-            {/* Context Input */}
-            <div className="waiting-context">
-              <h3>💡 Add Additional Context While Waiting</h3>
-              <p>You can provide additional context that will be passed to the agents in the next iteration.</p>
-              <textarea
-                className="ph-textarea"
-                placeholder="e.g., Focus on error handling paths, test database connection failures..."
-                value={contextInput}
-                onChange={(e) => setContextInput(e.target.value)}
-                rows={3}
-              />
             </div>
           </div>
         </div>

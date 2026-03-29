@@ -56,6 +56,10 @@ export async function rejectTests(sessionId, comments) {
 
 export async function getResults(sessionId) {
   const res = await fetch(`${API_BASE}/results/${sessionId}`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Results not available');
+  }
   return res.json();
 }
 
@@ -76,6 +80,26 @@ export async function createPR(sessionId, githubToken, branchName) {
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error || 'Failed to create PR');
+  }
+  return res.json();
+}
+
+// ─── History APIs ───────────────────────────────────────────────────────
+
+export async function getHistory() {
+  const res = await fetch(`${API_BASE}/history`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to load history');
+  }
+  return res.json();
+}
+
+export async function getHistoryEntry(entryId) {
+  const res = await fetch(`${API_BASE}/history/${entryId}`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to load history entry');
   }
   return res.json();
 }

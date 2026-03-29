@@ -13,3 +13,4 @@ gitpython
 markdown
 pymupdf
 weasyprint
+azure-storage-blob

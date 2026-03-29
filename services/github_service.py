@@ -4,6 +4,7 @@
 import os
 import re
 import ast
+import glob
 import shutil
 import tempfile
 from git import Repo
@@ -36,11 +37,51 @@ def clone_repo(url: str, target_dir: str = None) -> str:
     return target_dir
 
 
+def _extract_cobol_paragraphs(source: str) -> list[dict]:
+    """Extract user-defined COBOL paragraph and section names from source code.
+    Filters out all standard COBOL reserved words, verbs, and built-in constructs."""
+    from services.phoenix_engine import COBOL_RESERVED_WORDS
+
+    paragraphs = []
+    seen = set()
+
+    for match in re.finditer(r'^\s{0,7}([A-Z0-9][A-Z0-9-]{0,29})\s+(SECTION)\s*\.', source, re.MULTILINE | re.IGNORECASE):
+        name = match.group(1).upper()
+        if name not in COBOL_RESERVED_WORDS and name not in seen:
+            seen.add(name)
+            paragraphs.append({
+                "name": match.group(1),
+                "args": [],
+                "testable": True,
+                "type": "section",
+            })
+    for match in re.finditer(r'^\s{7,11}([A-Z0-9][A-Z0-9-]{0,29})\s*\.\s*$', source, re.MULTILINE | re.IGNORECASE):
+        name = match.group(1).upper()
+        if name not in COBOL_RESERVED_WORDS and name not in seen:
+            seen.add(name)
+            paragraphs.append({
+                "name": match.group(1),
+                "args": [],
+                "testable": True,
+                "type": "paragraph",
+            })
+    return paragraphs
+
+
 def analyze_repo_files(repo_dir: str) -> list[dict]:
     """
-    Discover all Python files in the repo and extract metadata.
-    Returns a list of dicts with path, name, function count, and size.
+    Discover all Python and COBOL files in the repo and extract metadata.
+    Returns a list of dicts with path, name, function count, language, and size.
     """
+    SUPPORTED_EXTENSIONS = {
+        '.py': 'python',
+        '.cob': 'cobol',
+        '.cbl': 'cobol',
+        '.cpy': 'cobol',
+        '.c': 'c',
+        '.h': 'c',
+    }
+
     files = []
     for root, dirs, filenames in os.walk(repo_dir):
         # Skip hidden dirs, __pycache__, .git, venv, node_modules
@@ -48,35 +89,53 @@ def analyze_repo_files(repo_dir: str) -> list[dict]:
                    ("__pycache__", "venv", ".venv", "node_modules", "env")]
 
         for fname in filenames:
-            if not fname.endswith(".py") or fname == "__init__.py":
+            ext = os.path.splitext(fname)[1].lower()
+            if ext not in SUPPORTED_EXTENSIONS:
+                continue
+            if ext == '.py' and fname == "__init__.py":
                 continue
 
+            language = SUPPORTED_EXTENSIONS[ext]
             fpath = os.path.join(root, fname)
             rel_path = os.path.relpath(fpath, repo_dir)
             size = os.path.getsize(fpath)
 
-            # Extract function info
-            try:
-                with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
-                    source = f.read()
-                tree = ast.parse(source)
-                functions = []
-                for node in ast.iter_child_nodes(tree):
-                    if isinstance(node, ast.FunctionDef):
-                        args = [a.arg for a in node.args.args]
-                        uses_input = any(
-                            isinstance(n, ast.Call)
-                            and isinstance(getattr(n, "func", None), ast.Name)
-                            and n.func.id == "input"
-                            for n in ast.walk(node)
-                        )
-                        functions.append({
-                            "name": node.name,
-                            "args": args,
-                            "testable": not uses_input,
-                        })
-            except (SyntaxError, UnicodeDecodeError):
-                functions = []
+            if language == 'python':
+                # Extract Python function info via AST
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                        source = f.read()
+                    tree = ast.parse(source)
+                    functions = []
+                    for node in ast.iter_child_nodes(tree):
+                        if isinstance(node, ast.FunctionDef):
+                            args = [a.arg for a in node.args.args]
+                            uses_input = any(
+                                isinstance(n, ast.Call)
+                                and isinstance(getattr(n, "func", None), ast.Name)
+                                and n.func.id == "input"
+                                for n in ast.walk(node)
+                            )
+                            functions.append({
+                                "name": node.name,
+                                "args": args,
+                                "testable": not uses_input,
+                            })
+                except (SyntaxError, UnicodeDecodeError):
+                    functions = []
+            else:
+                # COBOL: extract paragraph/section names via regex
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                        source = f.read()
+                    if language == 'cobol':
+                        functions = _extract_cobol_paragraphs(source)
+                    else:
+                        # C language
+                        from services.phoenix_engine import extract_c_functions
+                        functions = extract_c_functions(fpath)
+                except (UnicodeDecodeError, IOError):
+                    functions = []
 
             testable_count = sum(1 for fn in functions if fn.get("testable"))
 
@@ -84,10 +143,11 @@ def analyze_repo_files(repo_dir: str) -> list[dict]:
                 "path": rel_path,
                 "name": fname,
                 "size": size,
+                "language": language,
                 "functions": functions,
                 "function_count": len(functions),
                 "testable_count": testable_count,
-                "needs_context": len(functions) > 0,
+                "needs_context": len(functions) > 0 or language in ('cobol', 'c'),
             })
 
     return sorted(files, key=lambda f: f["path"])

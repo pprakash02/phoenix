@@ -14,6 +14,9 @@ LEGACY_WORKSPACE = os.path.abspath("legacy_workspace")
 TEST_RUNNER_IMAGE = "phoenix-test-runner"
 TEST_RUNNER_DOCKERFILE = b"FROM python:3.10-slim\nRUN pip install --no-cache-dir pytest\n"
 
+C_TEST_RUNNER_IMAGE = "phoenix-c-test-runner"
+C_TEST_RUNNER_DOCKERFILE = b"FROM gcc:latest\nWORKDIR /workspace\n"
+
 
 def _ensure_test_runner_image(docker_client: docker.DockerClient) -> None:
     """Build the phoenix-test-runner image if it doesn't already exist."""
@@ -76,6 +79,71 @@ def _run_test_in_sandbox(docker_client, test_file_name: str) -> dict:
         return {"file": test_file_name, "status": "ERROR", "detail": str(e)[:200]}
 
 
+def _ensure_c_test_runner_image(docker_client: docker.DockerClient) -> None:
+    """Build the phoenix-c-test-runner image if it doesn't already exist."""
+    try:
+        docker_client.images.get(C_TEST_RUNNER_IMAGE)
+    except docker.errors.ImageNotFound:
+        print(f"[SYSTEM] Building {C_TEST_RUNNER_IMAGE} Docker image (first time only)...")
+        docker_client.images.build(
+            fileobj=io.BytesIO(C_TEST_RUNNER_DOCKERFILE),
+            tag=C_TEST_RUNNER_IMAGE,
+            rm=True,
+        )
+        print(f"[SYSTEM] {C_TEST_RUNNER_IMAGE} image built successfully.")
+
+
+def _run_c_test_in_sandbox(docker_client, test_file_name: str) -> dict:
+    """Compile and run a C test file in Docker."""
+    test_path = os.path.join(GENERATED_TESTS_DIR, test_file_name)
+    if not os.path.isfile(test_path):
+        return {"file": test_file_name, "status": "ERROR", "detail": "File not found"}
+
+    print(f"\n[SYSTEM] Running C test verification for {test_file_name}...\n")
+
+    module_name = test_file_name.replace("test_", "").replace(".c", "")
+    # Find the source file to link against
+    source_candidates = [f"{module_name}.c", f"{module_name}.C"]
+
+    compile_cmd = f"gcc -o /tmp/test_output /workspace/{test_file_name}"
+    for candidate in source_candidates:
+        candidate_path = os.path.join(GENERATED_TESTS_DIR, candidate)
+        if os.path.isfile(candidate_path):
+            compile_cmd = f"gcc -o /tmp/test_output /workspace/{test_file_name} /workspace/{candidate}"
+            break
+
+    cmd = f"sh -c '{compile_cmd} -lm 2>&1 && /tmp/test_output 2>&1 || echo COMPILE_OR_RUN_FAILED'"
+
+    try:
+        container = docker_client.containers.create(
+            image=C_TEST_RUNNER_IMAGE,
+            command=cmd,
+            volumes={
+                GENERATED_TESTS_DIR: {'bind': '/workspace', 'mode': 'ro'},
+            },
+            working_dir="/workspace",
+            mem_limit="256m",
+            cpu_period=100000,
+            cpu_quota=50000,
+            network_disabled=True,
+        )
+        container.start()
+        container.wait(timeout=60)
+        logs = container.logs(stdout=True, stderr=True).decode("utf-8", errors="replace")
+        container.remove()
+
+        if "COMPILE_OR_RUN_FAILED" in logs or "error:" in logs.lower():
+            return {"file": test_file_name, "status": "FAILED", "passed": 0, "failed": 1, "detail": logs[-500:] if len(logs) > 500 else logs}
+        elif "All tests passed" in logs:
+            # Count test functions that ran
+            test_count = logs.count("test_")
+            return {"file": test_file_name, "status": "PASSED", "passed": max(test_count, 1), "failed": 0, "detail": logs[-300:] if len(logs) > 300 else logs}
+        else:
+            return {"file": test_file_name, "status": "PASSED", "passed": 1, "failed": 0, "detail": logs[-300:] if len(logs) > 300 else logs}
+    except Exception as e:
+        return {"file": test_file_name, "status": "ERROR", "detail": str(e)[:200]}
+
+
 @tool(approval_mode="never_require")
 def verify_all_tests(
     dummy: Annotated[str, Field(description="Dummy argument. Pass an empty string.")] = ""
@@ -86,21 +154,33 @@ def verify_all_tests(
     and returns a concise pass/fail summary.
     Call this ONCE — it handles everything.
     """
-    test_files = sorted(glob.glob(os.path.join(GENERATED_TESTS_DIR, "test_*.py")))
+    test_py_files = sorted(glob.glob(os.path.join(GENERATED_TESTS_DIR, "test_*.py")))
+    test_c_files = sorted(glob.glob(os.path.join(GENERATED_TESTS_DIR, "test_*.c")))
 
-    if not test_files:
+    if not test_py_files and not test_c_files:
         return "ERROR: No test files found in generated_tests/."
 
     docker_client = docker.from_env()
     _ensure_test_runner_image(docker_client)
+    if test_c_files:
+        _ensure_c_test_runner_image(docker_client)
 
     results = []
     total_passed = 0
     total_failed = 0
 
-    for tf in test_files:
+    # Run Python tests
+    for tf in test_py_files:
         fname = os.path.basename(tf)
         r = _run_test_in_sandbox(docker_client, fname)
+        results.append(r)
+        total_passed += r.get("passed", 0)
+        total_failed += r.get("failed", 0)
+
+    # Run C tests
+    for tf in test_c_files:
+        fname = os.path.basename(tf)
+        r = _run_c_test_in_sandbox(docker_client, fname)
         results.append(r)
         total_passed += r.get("passed", 0)
         total_failed += r.get("failed", 0)

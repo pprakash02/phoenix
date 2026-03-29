@@ -20,10 +20,9 @@ function StatusBar({ sessionId }) {
         </div>
       </div>
       <div className="status-footer">
-        <span className="footer-brand">🔥 PHOENIX SYSTEMS INTEGRATION — 2026</span>
+        <span className="footer-brand"> PHOENIX</span>
         <div className="footer-links">
-          <span>PRIVACY</span>
-          <span>SECURITY</span>
+          
           <span className="footer-status">STATUS: ONLINE</span>
         </div>
       </div>

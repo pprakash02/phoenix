@@ -1,0 +1,16 @@
+.venv/
+.git/
+.idea/
+.pytest_cache/
+__pycache__/
+node_modules/
+web/node_modules/
+generated_tests/
+*.pyc
+*.pyo
+.env
+.env.*
+Dockerfile*
+.dockerignore
+*.md
+.gitignore

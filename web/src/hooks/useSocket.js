@@ -3,10 +3,38 @@ import { io } from 'socket.io-client';
 
 const SOCKET_URL = window.location.origin;
 
+// localStorage keys for pipeline state
+const KEY_PROGRESS = 'phoenix_socketProgress';
+const KEY_RESULT = 'phoenix_socketResult';
+const KEY_STAGES = 'phoenix_progressStages';
+const KEY_MAX_PROGRESS = 'phoenix_maxProgress';
+
+const ALL_PIPELINE_KEYS = [KEY_PROGRESS, KEY_RESULT, KEY_STAGES, KEY_MAX_PROGRESS];
+
+/**
+ * Clear all pipeline-related localStorage keys.
+ * Exported so AnalysisPage can call it before starting a new pipeline.
+ */
+export function clearAllPipelineState() {
+  ALL_PIPELINE_KEYS.forEach((key) => {
+    try { localStorage.removeItem(key); } catch {}
+  });
+}
+
+function safeParse(key) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  } catch { return null; }
+}
+
 export function useSocket(sessionId) {
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [progress, setProgress] = useState(null);
+
+  // Restore progress from localStorage (so tab-switching preserves the timeline),
+  // but NEVER restore pipelineResult — that must come from a live WebSocket event only.
+  const [progress, setProgress] = useState(() => safeParse(KEY_PROGRESS));
   const [pipelineResult, setPipelineResult] = useState(null);
   const [error, setError] = useState(null);
 
@@ -28,12 +56,14 @@ export function useSocket(sessionId) {
     socket.on('agent_progress', (data) => {
       if (!sessionId || data.session_id === sessionId) {
         setProgress(data);
+        try { localStorage.setItem(KEY_PROGRESS, JSON.stringify(data)); } catch {}
       }
     });
 
     socket.on('pipeline_complete', (data) => {
       if (!sessionId || data.session_id === sessionId) {
         setPipelineResult(data);
+        // Don't persist pipelineResult — it must only come from live events
       }
     });
 
@@ -54,5 +84,12 @@ export function useSocket(sessionId) {
     }
   }, []);
 
-  return { isConnected, progress, pipelineResult, error, joinSession };
+  const resetState = useCallback(() => {
+    clearAllPipelineState();
+    setProgress(null);
+    setPipelineResult(null);
+    setError(null);
+  }, []);
+
+  return { isConnected, progress, pipelineResult, error, joinSession, resetState };
 }

@@ -21,16 +21,6 @@ MODEL_REGISTRY = {
         "display_name": "GPT OSS 120B",
         "description": "Open-source 120B parameter model via Azure",
     },
-    "claude-3.5-sonnet": {
-        "prefix": "AZURE_CLAUDE",
-        "display_name": "Claude 3.5 Sonnet",
-        "description": "Anthropic's Claude for nuanced code analysis",
-    },
-    "mistral-large": {
-        "prefix": "AZURE_MISTRAL",
-        "display_name": "Mistral Large",
-        "description": "Mistral AI's flagship model for efficient code generation",
-    },
 }
 
 # Cache instantiated clients
