@@ -2,6 +2,8 @@
 
 Phoenix is a multi-agent AI platform that **automatically modernizes undocumented legacy code**. Point it at any GitHub repository containing Python, COBOL, or C source files — Phoenix will analyze the code, capture runtime behavior, generate regression test suites, validate them in Docker sandboxes, and produce comprehensive documentation. All orchestrated by a team of AI agents, with a real-time web dashboard and human-in-the-loop feedback.
 
+**Live Demo:** [Phoenix Live Demo](https://phoenix-web-app-1.azurewebsites.net/)
+
 ---
 
 ## Table of Contents
